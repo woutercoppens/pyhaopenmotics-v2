@@ -1,0 +1,6 @@
+[flake8]
+max-line-length = 88
+ignore = D202
+per-file-ignores =
+    tests/*:DAR,S101
+    examples/*:DAR,S101
