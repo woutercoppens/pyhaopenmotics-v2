@@ -67,7 +67,9 @@ class OpenMoticsShutters:  # noqa: SIM119
         Returns:
             Returns a shutter with id
         """
-        path = f"/base/installations/{self._omcloud.installation_id}/shutters/{shutter_id}"
+        path = (
+            f"/base/installations/{self._omcloud.installation_id}/shutters/{shutter_id}"
+        )
         body = await self._omcloud.get(path)
 
         return Shutter.parse_obj(body["data"])

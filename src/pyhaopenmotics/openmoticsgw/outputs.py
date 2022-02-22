@@ -4,14 +4,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from pyhaopenmotics.helpers import merge_dicts
+from pyhaopenmotics.openmoticsgw.models.output import Output
+
 # from pydantic import parse_obj_as
 
-from pyhaopenmotics.helpers import merge_dicts
 
-from pyhaopenmotics.openmoticsgw.models.output import Output
 
 if TYPE_CHECKING:
     from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
+
 
 class OpenMoticsOutputs:  # noqa: SIM119
     """Object holding information of the OpenMotics outputs.
@@ -27,7 +29,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         """
         self._omcloud = omcloud
         self._output_configs: list = None
-    
+
     @property
     def output_configs(self):
         return self._output_configs
@@ -49,19 +51,17 @@ class OpenMoticsOutputs:  # noqa: SIM119
             Dict with all outputs
         """
         if self.output_configs is None:
-            goc = await self._omcloud.exec_action('get_output_configurations')
-            if goc['success'] is True: 
-                self.output_configs = goc['config']
-                
-        outputs_status = await self._omcloud.exec_action('get_output_status')
-        status = outputs_status['status']
+            goc = await self._omcloud.exec_action("get_output_configurations")
+            if goc["success"] is True:
+                self.output_configs = goc["config"]
 
-        data = merge_dicts(self.output_configs, 'status', status)
+        outputs_status = await self._omcloud.exec_action("get_output_status")
+        status = outputs_status["status"]
 
-        self._outputs = [
-            Output.from_dict(device) for device in data
-        ]
-    
+        data = merge_dicts(self.output_configs, "status", status)
+
+        self._outputs = [Output.from_dict(device) for device in data]
+
         return self._outputs
 
     async def get_by_id(
@@ -120,10 +120,10 @@ class OpenMoticsOutputs:  # noqa: SIM119
             value = min(value, 100)
             value = max(0, value)
 
-        data = {'id' : output_id, 'is_on' : True}
+        data = {"id": output_id, "is_on": True}
         if value is not None:
-            data['dimmer'] = value
-        return await self._omcloud.exec_action('set_output', data=data)
+            data["dimmer"] = value
+        return await self._omcloud.exec_action("set_output", data=data)
 
     async def turn_off(
         self,
@@ -138,5 +138,5 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Returns a output with id
         """
-        data = {'id' : output_id, 'is_on' : False}
-        return await self._omcloud.exec_action('set_output', data=data)
+        data = {"id": output_id, "is_on": False}
+        return await self._omcloud.exec_action("set_output", data=data)

@@ -11,6 +11,7 @@ from pyhaopenmotics.cloud.models.light import Light
 if TYPE_CHECKING:
     from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
 
+
 class OpenMoticsLights:  # noqa: SIM119
     """Object holding information of the OpenMotics lights.
 
@@ -118,7 +119,9 @@ class OpenMoticsLights:  # noqa: SIM119
         """
         if light_id is None:
             # Turn off all lights
-            path = f"/base/installations/{self._omcloud.installation_id}/lights/turn_off"
+            path = (
+                f"/base/installations/{self._omcloud.installation_id}/lights/turn_off"
+            )
         else:
             # Turn off light with id
             path = f"/base/installations/{self._omcloud.installation_id}/lights/{light_id}/turn_off"

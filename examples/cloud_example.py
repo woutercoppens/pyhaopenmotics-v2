@@ -10,10 +10,11 @@ How to use this script:
     python cloud_example.py
 """
 import asyncio
-# import imp
-import aiohttp
 import logging
 import os
+
+# import imp
+import aiohttp
 from yarl import URL
 
 try:
@@ -29,16 +30,16 @@ try:
 except ModuleNotFoundError as exc:
     raise ImportError("You have to run 'pip install authlib' first") from exc
 
+import aiohttp
 from oauthlib.oauth2 import BackendApplicationClient
+
 from pyhaopenmotics import OpenMoticsCloud
 from pyhaopenmotics.const import (
-    CLOUD_API_VERSION,
-    CLOUD_API_TOKEN_URL,
     CLOUD_API_AUTHORIZATION_URL,
+    CLOUD_API_TOKEN_URL,
+    CLOUD_API_VERSION,
     SCOPE,
 )
-
-import aiohttp
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
 log = logging.getLogger()
@@ -55,9 +56,12 @@ load_dotenv()
 client_id = os.environ["CLIENT_ID"]
 client_secret = os.environ["CLIENT_SECRET"]
 
-token_url = 'https://cloud.openmotics.com:443/api/v1/authentication/oauth2/token'
-authorize_url = 'https://cloud.openmotics.com:443/api/v1/authentication/oauth2/authorize'
-base_url = 'https://cloud.openmotics.com:443/api/v1'
+token_url = "https://cloud.openmotics.com:443/api/v1/authentication/oauth2/token"
+authorize_url = (
+    "https://cloud.openmotics.com:443/api/v1/authentication/oauth2/authorize"
+)
+base_url = "https://cloud.openmotics.com:443/api/v1"
+
 
 async def main():
     token = None
@@ -71,24 +75,25 @@ async def main():
         token_endpoint=token_url,
         grant_type="client_credentials",
         # update_token=self.token_saver,
-        ) as httpx_session:
+    ) as httpx_session:
         token = await async_get_token(httpx_session)
         await async_call_api(token)
 
+
 async def async_get_token(httpx_session):
     tkn = await httpx_session.fetch_token(
-                url=token_url,
-                grant_type="client_credentials",
-            )
-    token = tkn.get('access_token')
+        url=token_url,
+        grant_type="client_credentials",
+    )
+    token = tkn.get("access_token")
     print(token)
     return token
 
+
 async def async_call_api(token):
     print(f"async_call_api: {token}")
- 
-    omclient = OpenMoticsCloud(
-        token = token)
+
+    omclient = OpenMoticsCloud(token=token)
 
     installations = await omclient.installations.get_all()
     print(installations)

@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
-import logging
 import asyncio
-import ssl
-from importlib.abc import InspectLoader
+import logging
 import socket
+import ssl
 from dataclasses import dataclass
 from importlib import metadata
+from importlib.abc import InspectLoader
 from typing import Any, Optional, TypedDict
-import aiohttp
 
+import aiohttp
+import async_timeout
+from aiohttp.client import ClientError, ClientResponseError
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -21,14 +23,17 @@ from tenacity import (
 )
 from yarl import URL
 
-import async_timeout
-
-from aiohttp.client import ClientError, ClientResponseError
-
 from .__version__ import __version__
-from .errors import ApiException, RequestUnauthorizedException, NetworkTimeoutException, RequestBackoffException, RetryableException, client_error_handler
-
+from .errors import (
+    ApiException,
+    NetworkTimeoutException,
+    RequestBackoffException,
+    RequestUnauthorizedException,
+    RetryableException,
+    client_error_handler,
+)
 from .openmoticsgw.outputs import OpenMoticsOutputs
+
 
 class LocalGateway:
     """Docstring."""
@@ -37,7 +42,7 @@ class LocalGateway:
     _close_session: bool = False
 
     _webhook_refresh_timer_task: Optional[asyncio.TimerHandle] = None
-    _webhook_url: Optional[str] = None    
+    _webhook_url: Optional[str] = None
 
     def __init__(
         self,
@@ -76,7 +81,7 @@ class LocalGateway:
         self.request_timeout = request_timeout
         self.tls = tls
         self.username = username
-        # self.verify_ssl = verify_ssl   
+        # self.verify_ssl = verify_ssl
         self.ssl_context = ssl_context
 
         self.user_agent = user_agent
@@ -87,8 +92,8 @@ class LocalGateway:
 
         self.auth = None
         if self.username and self.password:
-            print('setting self.auth')
-            self.auth = { "username" : self.username, "password" : self.password }
+            print("setting self.auth")
+            self.auth = {"username": self.username, "password": self.password}
 
         self.outputs = OpenMoticsOutputs(self)
 
@@ -100,9 +105,9 @@ class LocalGateway:
     # )
     async def _request(
         self,
-        path: str, 
+        path: str,
         *,
-        method: str = aiohttp.hdrs.METH_POST, 
+        method: str = aiohttp.hdrs.METH_POST,
         data: dict = None,
         **kwargs,
     ) -> Any:
@@ -167,12 +172,7 @@ class LocalGateway:
 
         return await resp.text()  # type: ignore
 
-    async def exec_action(
-        self, 
-        path: str, 
-        data: dict = {},
-        **kwargs
-    ) -> dict[str, Any]:
+    async def exec_action(self, path: str, data: dict = {}, **kwargs) -> dict[str, Any]:
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
@@ -193,7 +193,7 @@ class LocalGateway:
         )
 
     def get_post_data(self, data):
-        """ Get the full post data dict, this method adds the token to the dict. """
+        """Get the full post data dict, this method adds the token to the dict."""
         if data is not None:
             d = data.copy()
         else:
@@ -203,12 +203,12 @@ class LocalGateway:
         return d
 
     async def login(self):
-        """ Login to the gateway: sets the token in the connector. """
-        print('in login')
+        """Login to the gateway: sets the token in the connector."""
+        print("in login")
         resp = await self._request(
-            path="login", 
+            path="login",
             data=self.auth,
-        ) 
+        )
 
         self.token = resp["token"]
         print(self.token)
@@ -233,7 +233,7 @@ class LocalGateway:
     #         "/ws/events",
     #         method=aiohttp.hdrs.METH_DELETE,
     #     )
-      
+
     async def close(self) -> None:
         """Close open client session."""
         if self._session and self._close_session:

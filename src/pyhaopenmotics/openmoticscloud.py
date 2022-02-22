@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-import logging
 import asyncio
-from importlib.abc import InspectLoader
+import logging
 import socket
 from dataclasses import dataclass
 from importlib import metadata
+from importlib.abc import InspectLoader
 from typing import Any, Optional, TypedDict
-import aiohttp
 
+import aiohttp
+import async_timeout
+from aiohttp.client import ClientError, ClientResponseError
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -20,29 +22,28 @@ from tenacity import (
 )
 from yarl import URL
 
-import async_timeout
-
-from aiohttp.client import ClientError, ClientResponseError
-
 from .__version__ import __version__
-from .const import (
-    CLOUD_API_VERSION,
-    CLOUD_API_TOKEN_URL,
-    CLOUD_API_AUTHORIZATION_URL,
-)
-from .errors import ApiException, RequestUnauthorizedException, NetworkTimeoutException, RequestBackoffException, RetryableException, client_error_handler
-
-from .cloud.installations import OpenMoticsInstallations
 from .cloud.groupactions import OpenMoticsGroupActions
-from .cloud.outputs import OpenMoticsOutputs
+from .cloud.installations import OpenMoticsInstallations
 from .cloud.lights import OpenMoticsLights
+from .cloud.outputs import OpenMoticsOutputs
 from .cloud.sensors import OpenMoticsSensors
 from .cloud.shutters import OpenMoticsShutters
 from .cloud.thermostats import OpenMoticsThermostats
+from .const import CLOUD_API_AUTHORIZATION_URL, CLOUD_API_TOKEN_URL, CLOUD_API_VERSION
+from .errors import (
+    ApiException,
+    NetworkTimeoutException,
+    RequestBackoffException,
+    RequestUnauthorizedException,
+    RetryableException,
+    client_error_handler,
+)
 
 
 class OpenMoticsCloud:
     """Docstring."""
+
     BASE_URL = "https://cloud.openmotics.com/api"
 
     _installations: Optional[List[Installation]] = None
@@ -50,7 +51,7 @@ class OpenMoticsCloud:
     _close_session: bool = False
 
     _webhook_refresh_timer_task: Optional[asyncio.TimerHandle] = None
-    _webhook_url: Optional[str] = None    
+    _webhook_url: Optional[str] = None
 
     def __init__(
         self,
@@ -80,16 +81,16 @@ class OpenMoticsCloud:
 
         self.installations = OpenMoticsInstallations(self)
         self.outputs = OpenMoticsOutputs(self)
-        self.groupactions= OpenMoticsGroupActions(self)
+        self.groupactions = OpenMoticsGroupActions(self)
         self.lights = OpenMoticsLights(self)
-        self.sensors = OpenMoticsSensors(self)    
+        self.sensors = OpenMoticsSensors(self)
         self.shutters = OpenMoticsShutters(self)
-        self.thermostats= OpenMoticsThermostats(self)
-        
+        self.thermostats = OpenMoticsThermostats(self)
+
     @property
     def installation_id(self):
         return self._installation_id
-    
+
     @installation_id.setter
     def installation_id(self, installation_id):
         self._installation_id = installation_id
@@ -102,9 +103,9 @@ class OpenMoticsCloud:
     # )
     async def _request(
         self,
-        path: str, 
-        *, 
-        method: str = aiohttp.hdrs.METH_GET, 
+        path: str,
+        *,
+        method: str = aiohttp.hdrs.METH_GET,
         **kwargs,
     ) -> Any:
         """Make post request using the underlying httpx AsyncClient.
@@ -122,7 +123,7 @@ class OpenMoticsCloud:
         if self.token_refresh_method is not None:
             self.token = await self.get_token()
 
-        url = str(URL(f"{self.base_url}/{CLOUD_API_VERSION}{path}"))  
+        url = str(URL(f"{self.base_url}/{CLOUD_API_VERSION}{path}"))
 
         if self._session is None:
             self._session = aiohttp.ClientSession()
@@ -176,7 +177,7 @@ class OpenMoticsCloud:
         """
         return await self._request(
             path,
-            method = aiohttp.hdrs.METH_GET,
+            method=aiohttp.hdrs.METH_GET,
             **kwargs,
         )
 
@@ -192,7 +193,7 @@ class OpenMoticsCloud:
         """
         return await self._request(
             path,
-            method = aiohttp.hdrs.METH_POST,
+            method=aiohttp.hdrs.METH_POST,
             **kwargs,
         )
 
@@ -205,7 +206,12 @@ class OpenMoticsCloud:
             method=aiohttp.hdrs.METH_POST,
             data={
                 "action": "set_subscription",
-                "types": ["OUTPUT_CHANGE", "SHUTTER_CHANGE", "THERMOSTAT_CHANGE", "THERMOSTAT_GROUP_CHANGE" ],
+                "types": [
+                    "OUTPUT_CHANGE",
+                    "SHUTTER_CHANGE",
+                    "THERMOSTAT_CHANGE",
+                    "THERMOSTAT_GROUP_CHANGE",
+                ],
                 "installation_ids": [installation_id],
             },
         )
@@ -216,12 +222,11 @@ class OpenMoticsCloud:
             "/ws/events",
             method=aiohttp.hdrs.METH_DELETE,
         )
-      
+
     async def close(self) -> None:
         """Close open client session."""
         if self._session and self._close_session:
             await self._session.close()
-
 
     async def __aenter__(self) -> OpenMoticsCloud:
         """Async enter."""

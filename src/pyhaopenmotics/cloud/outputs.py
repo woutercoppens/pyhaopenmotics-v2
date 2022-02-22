@@ -11,6 +11,7 @@ from pyhaopenmotics.cloud.models.output import Output
 if TYPE_CHECKING:
     from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
 
+
 class OpenMoticsOutputs:  # noqa: SIM119
     """Object holding information of the OpenMotics outputs.
 
@@ -62,7 +63,9 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Returns a output with id
         """
-        path = f"/base/installations/{self._omcloud.installation_id}/outputs/{output_id}"
+        path = (
+            f"/base/installations/{self._omcloud.installation_id}/outputs/{output_id}"
+        )
         body = await self._omcloud.get(path)
 
         return Output.parse_obj(body["data"])
@@ -120,7 +123,9 @@ class OpenMoticsOutputs:  # noqa: SIM119
         """
         if output_id is None:
             # Turn off all lights
-            path = f"/base/installations/{self._omcloud.installation_id}/outputs/turn_off"
+            path = (
+                f"/base/installations/{self._omcloud.installation_id}/outputs/turn_off"
+            )
         else:
             # Turn off light with id
             path = f"/base/installations/{self._omcloud.installation_id}/outputs/{output_id}/turn_off"

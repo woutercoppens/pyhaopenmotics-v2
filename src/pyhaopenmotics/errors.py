@@ -16,11 +16,9 @@ from typing import Generator  # , Union
 # )
 import aiohttp
 from aiohttp import ClientSession, ClientTimeout
-from aiohttp.web import (
-    HTTPTooManyRequests,
-    HTTPUnauthorized, 
-    HTTPForbidden,
-)
+from aiohttp.web import HTTPForbidden, HTTPTooManyRequests, HTTPUnauthorized
+
+
 class UnsuportedArgumentsException(Exception):
     """Exception.
 

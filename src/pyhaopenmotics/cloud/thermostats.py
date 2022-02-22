@@ -31,7 +31,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
 
     async def set_mode(
         self,
-        mode: str ,
+        mode: str,
     ) -> dict[str, Any]:
         """Set a mode to all Groups the User has access to
 
@@ -48,7 +48,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
 
     async def set_state(
         self,
-        state: str ,
+        state: str,
     ) -> dict[str, Any]:
         """Set a mode to all Groups the User has access to
 
@@ -77,8 +77,6 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
             _omcloud: _omcloud
         """
         self._omcloud = _omcloud
-
-
 
     async def get_all(  # noqa: A003
         self,
@@ -116,7 +114,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
     async def set_mode(
         self,
         thermostatgroup_id: int,
-        mode: str ,
+        mode: str,
     ) -> dict[str, Any]:
         """Turn on a specified Output object.
 
@@ -132,6 +130,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         payload = {"mode": mode}
         return await self._omcloud.post(path, json=payload)
 
+
 class OpenMoticsThermostatUnits:  # noqa: SIM119
     """Object holding information of the OpenMotics thermostats.
 
@@ -145,8 +144,6 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             _omcloud: _omcloud
         """
         self._omcloud = _omcloud
-
-
 
     async def get_all(  # noqa: A003
         self,
@@ -186,7 +183,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
     async def set_state(
         self,
         thermostatunit_id: int,
-        state: str ,
+        state: str,
     ) -> dict[str, Any]:
         """Set state of a thermostatunit.
 
@@ -205,7 +202,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
     async def set_temperature(
         self,
         thermostatunit_id: int,
-        temperature: float ,
+        temperature: float,
     ) -> dict[str, Any]:
         """Set temperature of a thermostatunit.
 
@@ -265,12 +262,12 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             "heating": {
                 "AWAY": heating_away_temp,
                 "VACATION": heating_vacation_temp,
-                "PARTY": heating_party_temp
+                "PARTY": heating_party_temp,
             },
             "cooling": {
                 "AWAY": cooling_away_temp,
                 "VACATION": cooling_vacation_temp,
-                "PARTY": cooling_party_temp
-            }
+                "PARTY": cooling_party_temp,
+            },
         }
         return await self._omcloud.post(path, json=payload)

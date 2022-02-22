@@ -1,8 +1,8 @@
 """Thermostat Model for the OpenMotics API."""
 from __future__ import annotations
+
 from lib2to3.pgen2.token import OP
 from statistics import mode
-
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -23,6 +23,7 @@ class GroupLocation(BaseModel):
     installation_id: Optional[int] = None
     room_id: Optional[int] = None
 
+
 class UnitLocation(BaseModel):
     """Class holding the location."""
 
@@ -30,11 +31,13 @@ class UnitLocation(BaseModel):
     installation_id: Optional[int] = None
     room_id: Optional[int] = None
 
+
 class GroupStatus(BaseModel):
     """Class holding the status."""
 
     mode: Optional[str] = None
     state: Optional[bool] = None
+
 
 class UnitStatus(BaseModel):
     """Class holding the status."""
@@ -45,12 +48,14 @@ class UnitStatus(BaseModel):
     output_1: Optional[str] = None
     preset: Optional[str] = None
 
+
 class Presets(BaseModel):
     """Class holding the status."""
 
     away: Optional[str] = None
     party: Optional[str] = None
     vacation: Optional[str] = None
+
 
 class Schedule(BaseModel):
     """Class holding the schedule."""
@@ -67,6 +72,7 @@ class ConfigurationPreset(BaseModel):
     presets: Optional[Presets] = None
     schedule: Optional[Schedule] = None
     sensor_id: Optional[int] = None
+
 
 class Configuration(BaseModel):
     """Class holding the configuration."""
@@ -91,20 +97,20 @@ class Acl(BaseModel):
 class ThermostatGroup(BaseModel):
     """Class holding an OpenMotics ThermostatGroup .
 
-    # noqa: E800
-#  {
-#     "_acl": <acl>,
-#     "_version": <version>,
-#     "schedule": {
-#         "<optional timestamp>": "AUTO|AWAY|PARTY|VACATION",
-#         ...
-#     },
-#     "status": {
-#         "mode": "HEATING|COOLING",
-#         "state": "ON|OFF"
-#     },
-#     "capabilities": ["HEATING", "COOLING"]
-# }
+        # noqa: E800
+    #  {
+    #     "_acl": <acl>,
+    #     "_version": <version>,
+    #     "schedule": {
+    #         "<optional timestamp>": "AUTO|AWAY|PARTY|VACATION",
+    #         ...
+    #     },
+    #     "status": {
+    #         "mode": "HEATING|COOLING",
+    #         "state": "ON|OFF"
+    #     },
+    #     "capabilities": ["HEATING", "COOLING"]
+    # }
 
     """
 
@@ -127,6 +133,7 @@ class ThermostatGroup(BaseModel):
 
         """
         return f"{self.idx}_{self.name}"
+
 
 class ThermostatUnit(BaseModel):
     """Class holding an OpenMotics ThermostatGroup .
@@ -198,6 +205,7 @@ class ThermostatUnit(BaseModel):
     #     }
     # }
     """
+
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
     local_id: Optional[int] = None

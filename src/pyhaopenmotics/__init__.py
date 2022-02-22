@@ -14,8 +14,9 @@ from .errors import (
     RetryableException,
     UnsuportedArgumentsException,
 )
-from .openmoticscloud import OpenMoticsCloud
 from .localgateway import LocalGateway
+from .openmoticscloud import OpenMoticsCloud
+
 # from .auth import OpenMoticsCloudSession
 
 __all__ = [
