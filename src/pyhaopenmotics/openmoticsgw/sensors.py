@@ -24,7 +24,7 @@ class OpenMoticsSensors:  # noqa: SIM119
             omcloud: LocalGateway
         """
         self._omcloud = omcloud
-        self._sensor_configs: list[Any] =[]
+        self._sensor_configs: list[Any] = []
 
     @property
     def sensor_configs(self) -> list[Any]:
@@ -47,7 +47,7 @@ class OpenMoticsSensors:  # noqa: SIM119
     async def get_all(  # noqa: A003
         self,
         sensor_filter: str | None = None,
-    ) -> list[Sensor]: 
+    ) -> list[Sensor]:
         """Get a list of all sensor objects.
 
         Args:
@@ -61,12 +61,18 @@ class OpenMoticsSensors:  # noqa: SIM119
             if goc["success"] is True:
                 self.sensor_configs = goc["config"]
 
-        sensor_brightness_status = await self._omcloud.exec_action("get_sensor_brightness_status")
+        sensor_brightness_status = await self._omcloud.exec_action(
+            "get_sensor_brightness_status"
+        )
         brightness_status = sensor_brightness_status["status"]
         print(brightness_status)
-        sensor_humidity_status = await self._omcloud.exec_action("get_sensor_humidity_status")
+        sensor_humidity_status = await self._omcloud.exec_action(
+            "get_sensor_humidity_status"
+        )
         humidity_status = sensor_humidity_status["status"]
-        sensor_temperature_status = await self._omcloud.exec_action("get_sensor_temperature_status")
+        sensor_temperature_status = await self._omcloud.exec_action(
+            "get_sensor_temperature_status"
+        )
         temperature_status = sensor_temperature_status["status"]
 
         data0 = merge_dicts(self.sensor_configs, "status", brightness_status)
@@ -74,12 +80,12 @@ class OpenMoticsSensors:  # noqa: SIM119
         data = merge_dicts(data1, "status", temperature_status)
 
         sensors = [Sensor.from_dict(device) for device in data]
-        
+
         if sensor_filter is not None:
             # implemented later
             pass
 
-        return sensors # type: ignore
+        return sensors  # type: ignore
 
     async def get_by_id(
         self,
@@ -93,9 +99,8 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns:
             Returns a sensor with id
         """
-        # result: Sensor = None
         for sensor in await self.get_all():
-            if sensor.idx == sensor_id: 
+            if sensor.idx == sensor_id:
                 result = sensor
 
-        return result 
+        return result

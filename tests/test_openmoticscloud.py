@@ -6,10 +6,7 @@ import aiohttp
 import pytest
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.const import (
-    CLOUD_BASE_URL,
-    CLOUD_API_VERSION,
-)
+from pyhaopenmotics.const import CLOUD_API_VERSION, CLOUD_BASE_URL
 from pyhaopenmotics.errors import (
     OpenMoticsConnectionError,
     OpenMoticsConnectionTimeoutError,
@@ -28,7 +25,7 @@ get_installations_data_request = {
 
 
 # @pytest.mark.asyncio
-# async def test_json_request(aresponses):
+# async def test_json_request(aresponses) -> None:
 #     """Test JSON response is handled correctly."""
 #     aresponses.add(
 #         CLOUD_BASE_URL,
@@ -48,7 +45,7 @@ get_installations_data_request = {
 
 
 # @pytest.mark.asyncio
-# async def test_internal_session(aresponses):
+# async def test_internal_session(aresponses) -> None:
 #     """Test JSON response is handled correctly."""
 #     aresponses.add(
 #         CLOUD_BASE_URL,
@@ -66,7 +63,7 @@ get_installations_data_request = {
 
 
 @pytest.mark.asyncio
-async def test_timeout(aresponses):
+async def test_timeout(aresponses) -> None:
     """Test request timeout."""
     # Faking a timeout by sleeping
     async def response_handler(_):
@@ -78,7 +75,7 @@ async def test_timeout(aresponses):
     async with aiohttp.ClientSession() as session:
         open_motics = OpenMoticsCloud(
             session=session,
-            token='12345', # noqa: S106
+            token="12345",  # noqa: S106
             request_timeout=1,
         )
         with pytest.raises(OpenMoticsConnectionError):
@@ -86,7 +83,7 @@ async def test_timeout(aresponses):
 
 
 @pytest.mark.asyncio
-async def test_http_error400(aresponses):
+async def test_http_error400(aresponses) -> None:
     """Test HTTP 404 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,
@@ -96,18 +93,18 @@ async def test_http_error400(aresponses):
     )
 
     async with aiohttp.ClientSession() as session:
-        open_motics = OpenMoticsCloud(session=session, token='12345') # noqa: S106
+        open_motics = OpenMoticsCloud(session=session, token="12345")  # noqa: S106
         with pytest.raises(OpenMoticsError):
             assert await open_motics._request("/")
 
 
 @pytest.mark.asyncio
-async def test_http_error500(aresponses):
+async def test_http_error500(aresponses) -> None:
     """Test HTTP 500 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,
         CLOUD_API_VERSION,
-        "GET", 
+        "GET",
         aresponses.Response(
             body=b'{"status":"nok"}',
             status=500,
@@ -116,6 +113,6 @@ async def test_http_error500(aresponses):
     )
 
     async with aiohttp.ClientSession() as session:
-        open_motics = OpenMoticsCloud(session=session, token='12345') # noqa: S106
+        open_motics = OpenMoticsCloud(session=session, token="12345")  # noqa: S106
         with pytest.raises(OpenMoticsError):
             assert await open_motics._request("/")

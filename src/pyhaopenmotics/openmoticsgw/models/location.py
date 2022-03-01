@@ -9,20 +9,20 @@ from typing import Any
 class FloorCoordinates:
     """Class holding the floor_coordinates."""
 
-    x: int
-    y: int
+    x: int  # pylint: disable-msg=C0103
+    y: int  # pylint: disable-msg=C0103
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> FloorCoordinates | None:
         """Get floor coordinates from data.
-        
+
         Args:
             data: dict
-            
-        Returs:
+
+        Returns:
             FloorCoordinates object
         """
-        if 'x' not in data or 'y' not in data:
+        if "x" not in data or "y" not in data:
             return None
 
         return FloorCoordinates(
@@ -36,24 +36,24 @@ class Location:
     """Class holding the location."""
 
     floor_coordinates: FloorCoordinates | None
-    installation_id: int 
-    gateway_id: int 
-    floor_id: int 
-    room_id: int 
+    installation_id: int
+    gateway_id: int
+    floor_id: int
+    room_id: int
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> Location:
         """Get location coordinates from data.
-        
+
         Args:
             data: dict
-            
-        Returs:
+
+        Returns:
             Location object
         """
 
         _floor_coordinates: FloorCoordinates | None
-        _room_id: int 
+        _room_id: int
 
         if data is not None:
             if "room_id" in data:
@@ -70,9 +70,8 @@ class Location:
 
         return Location(
             floor_coordinates=_floor_coordinates,
-            installation_id=data.get("installation_id",0),
+            installation_id=data.get("installation_id", 0),
             gateway_id=data.get("gateway_id", 0),
             floor_id=data.get("floor_id", 0),
             room_id=_room_id,
         )
-

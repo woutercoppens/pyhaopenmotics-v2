@@ -2,8 +2,7 @@
 
 import logging
 from typing import Any
-import aiohttp
-import asyncio
+
 
 def get_key_for_word(dictionary: dict[str, Any], word: str) -> Any:
     """Return the key with value.
