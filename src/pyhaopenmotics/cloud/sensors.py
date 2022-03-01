@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from pydantic import parse_obj_as
 
@@ -22,7 +22,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 

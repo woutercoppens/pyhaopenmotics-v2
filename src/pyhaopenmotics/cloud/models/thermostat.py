@@ -1,97 +1,87 @@
 """Thermostat Model for the OpenMotics API."""
 from __future__ import annotations
 
-from lib2to3.pgen2.token import OP
-from statistics import mode
-from typing import List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
-
-
-class FloorCoordinates(BaseModel):
-    """Class holding the floor_coordinates."""
-
-    x: Optional[int] = None
-    y: Optional[int] = None
 
 
 class GroupLocation(BaseModel):
     """Class holding the location."""
 
-    floor_coordinates: Optional[FloorCoordinates] = None
-    floor_id: Optional[int] = None
-    installation_id: Optional[int] = None
-    room_id: Optional[int] = None
+    thermostat_group_id: Optional[int]
+    installation_id: Optional[int]
+    room_id: Optional[int]
 
 
 class UnitLocation(BaseModel):
     """Class holding the location."""
 
-    thermostat_group_id: Optional[int] = None
-    installation_id: Optional[int] = None
-    room_id: Optional[int] = None
+    thermostat_group_id: Optional[int]
+    installation_id: Optional[int]
+    room_id: Optional[int]
 
 
 class GroupStatus(BaseModel):
     """Class holding the status."""
 
-    mode: Optional[str] = None
-    state: Optional[bool] = None
+    mode: Optional[str]
+    state: Optional[bool]
 
 
 class UnitStatus(BaseModel):
     """Class holding the status."""
 
-    actual_temperature: Optional[float] = None
-    current_setpoint: Optional[float] = None
-    output_0: Optional[str] = None
-    output_1: Optional[str] = None
-    preset: Optional[str] = None
+    actual_temperature: Optional[float]
+    current_setpoint: Optional[float]
+    output_0: Optional[str]
+    output_1: Optional[str]
+    preset: Optional[str]
 
 
 class Presets(BaseModel):
     """Class holding the status."""
 
-    away: Optional[str] = None
-    party: Optional[str] = None
-    vacation: Optional[str] = None
+    away: Optional[str]
+    party: Optional[str]
+    vacation: Optional[str]
 
 
 class Schedule(BaseModel):
     """Class holding the schedule."""
 
-    data: Optional[dict] = None
-    start: Optional[str] = None
+    data: Optional[dict[str, Any]]
+    start: Optional[str]
 
 
 class ConfigurationPreset(BaseModel):
     """Class holding the configuration presets."""
 
-    output_0_id: Optional[int] = None
-    output_1_id: Optional[int] = None
-    presets: Optional[Presets] = None
-    schedule: Optional[Schedule] = None
-    sensor_id: Optional[int] = None
+    output_0_id: Optional[int]
+    output_1_id: Optional[int]
+    presets: Optional[Presets]
+    schedule: Optional[Schedule]
+    sensor_id: Optional[int]
 
 
 class Configuration(BaseModel):
     """Class holding the configuration."""
 
-    heating: Optional[ConfigurationPreset] = None
-    cooling: Optional[ConfigurationPreset] = None
+    heating: Optional[ConfigurationPreset]
+    cooling: Optional[ConfigurationPreset]
 
 
 class Allowed(BaseModel):
     """Object holding allowed."""
 
-    allowed: Optional[bool] = None
+    allowed: Optional[bool]
 
 
 class Acl(BaseModel):
     """Object holding an acl."""
 
-    set_state: Optional[Allowed] = None
-    set_mode: Optional[Allowed] = None
+    set_state: Optional[Allowed]
+    set_mode: Optional[Allowed]
 
 
 class ThermostatGroup(BaseModel):
@@ -117,15 +107,15 @@ class ThermostatGroup(BaseModel):
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
     local_id: int
-    name: Optional[str] = None
-    location: Optional[GroupLocation] = None
-    status: Optional[GroupStatus] = None
-    version: Optional[str] = Field(None, alias="_version")
-    acl: Optional[Acl] = Field(None, alias="_acl")
-    thermostat_ids: Optional[dict] = None
-    schedule: Optional[Schedule] = None
+    name: str
+    schedule: Optional[Schedule]
+    capabilities: Optional[list[Any]]
+    version: Optional[str] = Field(..., alias="_version")
+    thermostat_ids: Optional[dict[str, Any]]
+    status: Optional[GroupStatus]
+    acl: Optional[Acl] = Field(..., alias="_acl")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Represent the class objects as a string.
 
         Returns:
@@ -208,14 +198,14 @@ class ThermostatUnit(BaseModel):
 
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
-    local_id: Optional[int] = None
-    name: Optional[str] = None
+    local_id: Optional[int]
+    name: str
     location: Optional[UnitLocation] = None
-    status: Optional[UnitStatus] = None
-    version: Optional[str] = Field(None, alias="_version")
-    acl: Optional[str] = Field(None, alias="_acl")
+    status: Optional[UnitStatus]
+    version: Optional[str] = Field(..., alias="_version")
+    acl: Optional[str] = Field(..., alias="_acl")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Represent the class objects as a string.
 
         Returns:

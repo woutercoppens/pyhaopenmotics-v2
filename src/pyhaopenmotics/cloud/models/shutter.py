@@ -1,45 +1,30 @@
 """Output Model for the OpenMotics API."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-
-class FloorCoordinates(BaseModel):
-    """Class holding the floor_coordinates."""
-
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-
-class Location(BaseModel):
-    """Class holding the location."""
-
-    floor_coordinates: Optional[FloorCoordinates] = None
-    installation_id: Optional[int] = None
-    floor_id: Optional[int] = None
-    gateway_id: Optional[int] = None
-    room_id: Optional[int] = None
+from .location import Location
 
 
 class Status(BaseModel):
     """Class holding the status."""
 
-    locked: Optional[bool] = None
-    manual_override: Optional[bool] = None
-    state: Optional[str] = None
-    position: Optional[int] = None
-    last_change: Optional[float] = None
-    preset_position: Optional[int] = None
+    locked: Optional[bool]
+    manual_override: Optional[bool]
+    state: Optional[str]
+    position: Optional[int]
+    last_change: Optional[float]
+    preset_position: Optional[int]
 
 
 class Attributes(BaseModel):
     """Class holding the attributes."""
 
-    azimuth: Optional[str] = None
-    compass_point: Optional[str] = None
-    surface_area: Optional[str] = None
+    azimuth: Optional[str]
+    compass_point: Optional[str]
+    surface_area: Optional[str]
 
 
 class Shutter(BaseModel):
@@ -82,17 +67,17 @@ class Shutter(BaseModel):
 
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
-    local_id: Optional[int] = None
-    name: Optional[str] = None
-    shutter_type: str = Field(None, alias="type")
-    capabilities: Optional[dict] = None
-    status: Optional[Status] = None
-    location: Optional[Location] = None
-    attributes: Optional[Attributes] = None
-    metadata: Optional[str] = None
-    version: Optional[str] = Field(None, alias="_version")
+    local_id: Optional[int]
+    name: str
+    shutter_type: str = Field(..., alias="type")
+    capabilities: Optional[dict[str, Any]]
+    status: Status
+    location: Optional[Location]
+    attributes: Optional[Attributes]
+    metadata: Optional[str]
+    version: Optional[str] = Field(..., alias="_version")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Represent the class objects as a string.
 
         Returns:

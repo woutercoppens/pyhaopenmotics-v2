@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # noqa: E800
-"""
-Local Example.
+"""Local Example.
 
 How to use this script:
     pip install python-dotenv
@@ -11,43 +10,46 @@ How to use this script:
     python cloud_example.py
 """
 import asyncio
-import logging
 import os
 import ssl
 
-import certifi
 from dotenv import load_dotenv
 
 from pyhaopenmotics import LocalGateway
 
+# noqa: E800
+# import certifi
+# import logging
+
+
 ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+# noqa: E800
 ssl_context.options &= ~ssl.OP_NO_SSLv3
 ssl_context.minimum_version = ssl.TLSVersion.TLSv1
-# ssl_context.set_ciphers("DEFAULT:@SECLEVEL=1") # enables weaker ciphers and protocols
 ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols
-# ssl_context.load_verify_locations(certifi.where())
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
+# # ssl_context.set_ciphers("DEFAULT:@SECLEVEL=1") # enables weaker ciphers and protocols
+# # ssl_context.load_verify_locations(certifi.where())
 
 load_dotenv()
 
 localgw = os.environ["LOCALGW"]
 username = os.environ["USER_NAME"]
 password = os.environ["PASSWORD"]
-port = os.environ["PORT"]
-tls = os.environ["TLS"]
-# verify_ssl = os.environ["VERIFY_SSL"]
+port = int(os.environ["PORT"])
+tls = bool(os.environ["TLS"])
 
 
 async def main() -> None:
     """Show example on controlling your OpenMotics device."""
+
     async with LocalGateway(
         localgw=localgw,
         username=username,
         password=password,
         port=port,
         tls=tls,
-        # verify_ssl=verify_ssl,
         ssl_context=ssl_context,
     ) as omclient:
         await omclient.login()
@@ -67,8 +69,9 @@ async def main() -> None:
         print(output_0)
 
         await omclient.outputs.toggle(0)
-        # sensors = await omclient.sensors.get_all()
-        # print(sensors)
+
+        sensors = await omclient.sensors.get_all()
+        print(sensors)
 
         await omclient.close()
 

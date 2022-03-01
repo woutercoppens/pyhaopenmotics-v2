@@ -12,10 +12,9 @@ from pyhaopenmotics.openmoticsgw.models.location import Location
 class Status:
     """Class holding the status."""
 
-    on: bool
-    locked: bool
-    manual_override: bool
-    value: int
+    humidity: float
+    temperature: float
+    brightness: int
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> Status:
@@ -29,52 +28,46 @@ class Status:
         """
         return Status(
             # on = True if status = 1
-            on=data.get("status") == 1,
-            locked=data.get("locked", False),
-            value=data.get("dimmer", 0),
-            manual_override=data.get("manual_override", False),
+            humidity=data.get("humidity", 0),
+            temperature=data.get("temperature", 0),
+            brightness=data.get("brightness", 0),
         )
 
 
 @dataclass
-class Output:
-    """Class holding an OpenMotics Output.
+class Sensor:
+    """Class holding an OpenMotics Sensor.
 
     # noqa: E800
-    # [{
-    #     'name': 'name1',
-    #     'type': 'OUTLET',
-    #     'capabilities': ['ON_OFF'],
-    #     'location': {'floor_coordinates': {'x': None, 'y': None},
-    #          'installation_id': 21,
-    #          'gateway_id': 408,
-    #          'floor_id': None,
-    #          'room_id': None},
-    #     'metadata': None,
-    #     'status': {'on': False, 'locked': False, 'manual_override': False},
-    #     'last_state_change': 1633099611.275243,
-    #     'id': 18,
-    #     '_version': 1.0
-    #     },{
-    #     'name': 'name2',
-    #     'type': 'OUTLET',
-    #     ...
+    #     {
+    #     "_version": <version>,
+    #     "id": <id>,
+    #     "name": "<name>",
+    #     "location": {
+    #         "room_id": null | <room_id>,
+    #         "installation_id": <installation id>
+    #     },
+    #     "status": {
+    #         "humidity": null | <hunidity 0 - 100>,
+    #         "temperature": null | <temperature -32 - 95>,
+    #         "brightness": null | <brightness 0 - 100>
+    #     }
+    # }
+     #     ...
     """
 
     # pylint: disable=too-many-instance-attributes
     idx: int
     local_id: int
     name: str
-    output_type: str
     location: Location
-    capabilities: list[str]
-    metadata: dict[str, Any]
+    physical_quantity: str
     status: Status
     last_state_change: float
     version: str
 
     @staticmethod
-    def from_dict(data: dict[str, Any]) -> Output | None:
+    def from_dict(data: dict[str, Any]) -> Sensor | None:
         """Return Output object from OpenMotics API response.
 
         Args:
@@ -83,7 +76,6 @@ class Output:
         Returns:
             A Output object.
         """
-        output_type = OPENMOTICS_OUTPUT_TYPE_TO_NAME[data.get("type", 0)]
 
         status = Status.from_dict({})
         if "status" in data:
@@ -95,14 +87,12 @@ class Output:
         if data.get("module_type") == "D":
             capabilities.append("RANGE")
 
-        return Output(
+        return Sensor(
             idx=data.get("id", 0),
             local_id=data.get("id", 0),
             name=data.get("name", "None"),
-            output_type=output_type,
             location=Location.from_dict(data),
-            capabilities=capabilities,
-            metadata={},
+            physical_quantity=data.get("physical_quantity", "None"),
             status=status,
             last_state_change=data.get("last_state_change", None),
             version=data.get("version", "0.0"),
@@ -115,4 +105,4 @@ class Output:
             string
 
         """
-        return f"{self.idx}_{self.name}_{self.output_type}"
+        return f"{self.idx}_{self.name}"

@@ -1,7 +1,7 @@
 """Module containing the base of an output."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 from pydantic import parse_obj_as
 
@@ -21,14 +21,14 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 
     async def get_all(
         self,
         groupactions_filter: str | None = None,
-    ) -> List[GroupAction]:
+    ) -> list[GroupAction]:
         """Call lists all GroupAction objects.
 
         Args:
@@ -88,7 +88,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
     async def trigger(
         self,
         groupaction_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Trigger a specified groupaction object.
 
         Args:
@@ -107,14 +107,13 @@ class OpenMoticsGroupActions:  # noqa: SIM119
     async def by_usage(
         self,
         groupaction_usage: str,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Return a specified groupaction object.
 
         The usage filter allows the GroupActions to be filtered for their
         intended usage.
 
         Args:
-            installation_id: int
             groupaction_usage: str
 
         Returns:
@@ -124,16 +123,14 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         query_params = {"usage": groupaction_usage.upper()}
         return await self._omcloud.get(path, params=query_params)
 
-    async def scenes(self) -> dict[str, Any]:
+    async def scenes(self) -> Any:
         """Return all scenes object.
 
         SCENE: These GroupActions can be considered a scene,
             e.g. watching tv or romantic dinner.
 
-        Args:
-            installation_id: int
-
         Returns:
             Returns all scenes
         """
-        return await self.by_usage("SCENE")
+        response = await self.by_usage("SCENE")
+        return response

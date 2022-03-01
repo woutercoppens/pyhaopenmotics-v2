@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 from pydantic import parse_obj_as
 
@@ -22,14 +22,14 @@ class OpenMoticsShutters:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 
-    async def get_all(  # type: ignore
+    async def get_all(
         self,
         shutter_filter: str | None = None,
-    ) -> List[Shutter]:
+    ) -> list[Shutter]:
         """List all Shutter objects.
 
         Args:
@@ -55,7 +55,7 @@ class OpenMoticsShutters:  # noqa: SIM119
 
         return parse_obj_as(list[Shutter], body["data"])
 
-    async def get_by_id(  # type: ignore
+    async def get_by_id(
         self,
         shutter_id: int,
     ) -> Shutter:
@@ -77,7 +77,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def move_up(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Move the specified Shutter into the upwards position.
 
         Args:
@@ -92,7 +92,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def move_down(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Move the specified Shutter into the downwards position.
 
         Args:
@@ -107,7 +107,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def stop(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Stop any movement of the specified Shutter.
 
         Args:
@@ -123,7 +123,7 @@ class OpenMoticsShutters:  # noqa: SIM119
         self,
         shutter_id: int,
         position: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Change the position of the specified Shutter.
 
         The position can be set from 0 to steps (excluded). The steps value can be
@@ -153,7 +153,7 @@ class OpenMoticsShutters:  # noqa: SIM119
         self,
         shutter_id: int,
         offset: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Change the relative position of the specified Shutter.
 
         The offset can be set from -steps (excluded) to steps (excluded).
@@ -182,7 +182,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def lock(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Lock the specified Shutter to prevent future movements.
 
         The behavior is depending of the capabilities of the Shutter:
@@ -204,7 +204,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def unlock(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Undo the lock action of the specified Shutter.
 
         Args:
@@ -220,7 +220,7 @@ class OpenMoticsShutters:  # noqa: SIM119
         self,
         shutter_id: int,
         position: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Change the preset position of the specified Shutter.
 
         The position can be set from 0 to steps (excluded). The steps value can be
@@ -245,7 +245,7 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def move_to_preset(
         self,
         shutter_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Move the specified Shutter to its preset position (defined in POST .../preset).
 
         Not all gateways or shutters support this feature.

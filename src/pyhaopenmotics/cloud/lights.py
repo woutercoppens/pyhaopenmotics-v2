@@ -22,7 +22,7 @@ class OpenMoticsLights:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 
@@ -71,7 +71,7 @@ class OpenMoticsLights:  # noqa: SIM119
     async def toggle(
         self,
         light_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Toggle a specified light object.
 
         Args:
@@ -87,7 +87,7 @@ class OpenMoticsLights:  # noqa: SIM119
         self,
         light_id: int,
         value: int | None = 100,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Turn on a specified light object.
 
         Args:
@@ -108,7 +108,7 @@ class OpenMoticsLights:  # noqa: SIM119
     async def turn_off(
         self,
         light_id: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Turn off a specified light object.
 
         Args:

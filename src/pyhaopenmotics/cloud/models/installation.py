@@ -1,7 +1,7 @@
 """Installation Model for the OpenMotics API."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -9,21 +9,21 @@ from pydantic import BaseModel, Field
 class Allowed(BaseModel):
     """Object holding an OpenMotics Installation."""
 
-    allowed: Optional[bool] = None
+    allowed: Optional[bool]
 
 
 class Acl(BaseModel):
     """Object holding an OpenMotics Installation."""
 
-    configure: Optional[Allowed] = None
-    view: Optional[Allowed] = None
-    control: Optional[Allowed] = None
+    configure: Optional[Allowed]
+    view: Optional[Allowed]
+    control: Optional[Allowed]
 
 
 class Network(BaseModel):
     """Object holding an OpenMotics Installation."""
 
-    local_ip_address: Optional[str] = None
+    local_ip_address: Optional[str]
 
 
 class Installation(BaseModel):
@@ -63,20 +63,20 @@ class Installation(BaseModel):
 
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
-    name: Optional[str] = None
-    description: Optional[str] = None
-    gateway_model: Optional[str] = None
-    acl: Optional[Acl] = Field(None, alias="_acl")
-    version: Optional[str] = Field(None, alias="_version")
-    user_role: Optional[dict] = None
-    registration_key: Optional[str] = None
-    platform: Optional[str] = None
-    building_roles: Optional[dict] = None
-    network: Optional[Network] = None
-    flags: Optional[dict] = None
-    features: Optional[dict] = None
+    name: str
+    description: str
+    gateway_model: Optional[str]
+    acl: Acl = Field(..., alias="_acl")
+    version: str = Field(..., alias="_version")
+    user_role: Optional[dict[str, Any]]
+    registration_key: Optional[str]
+    platform: Optional[str]
+    building_roles: Optional[dict[str, Any]]
+    network: Optional[Network]
+    flags: Optional[dict[str, Any]]
+    features: Optional[dict[str, Any]]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Represent the class objects as a string.
 
         Returns:

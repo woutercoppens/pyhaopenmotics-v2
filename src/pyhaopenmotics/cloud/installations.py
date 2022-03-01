@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from pydantic import parse_obj_as
 
@@ -22,14 +22,14 @@ class OpenMoticsInstallations:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: OpenMoticsCloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 
     async def get_all(  # noqa: A003
         self,
         installation_filter: str | None = None,
-    ) -> List[Installation]:
+    ) -> list[Installation]:
         """List all Installation objects.
 
         Args:

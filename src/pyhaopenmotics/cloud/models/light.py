@@ -1,25 +1,11 @@
 """Light Model for the OpenMotics API."""
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-
-class FloorCoordinates(BaseModel):
-    """Class holding the floor_coordinates."""
-
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-
-class Location(BaseModel):
-    """Class holding the location."""
-
-    floor_coordinates: Optional[FloorCoordinates] = None
-    floor_id: Optional[int] = None
-    installation_id: Optional[int] = None
-    room_id: Optional[int] = None
+from .location import Location
 
 
 class Status(BaseModel):
@@ -62,14 +48,14 @@ class Light(BaseModel):
     idx: int = Field(..., alias="id")
     local_id: Optional[int] = None
     name: Optional[str] = None
-    capabilities: Optional[List] = None
+    capabilities: Optional[list[Any]] = None
     location: Optional[Location] = None
     status: Optional[Status] = None
     version: Optional[str] = Field(None, alias="_version")
 
     _brightness: Optional[int] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Represent the class objects as a string.
 
         Returns:

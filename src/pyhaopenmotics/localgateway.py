@@ -1,48 +1,32 @@
-"""Module containing a ThermostatClient for the Netatmo API."""
+"""Module containing a LocalGateway Client for the OpenMotics API."""
 
 from __future__ import annotations
 
 import asyncio
-import logging
 import socket
 import ssl
-from dataclasses import dataclass
-from importlib import metadata
-from importlib.abc import InspectLoader
-from typing import Any, Optional, TypedDict
+from typing import Any, Optional
 
 import aiohttp
 import async_timeout
+import backoff
 from aiohttp.client import ClientError, ClientResponseError
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    stop_after_delay,
-    wait_random_exponential,
-)
 from yarl import URL
 
 from .__version__ import __version__
 from .errors import (
-    ApiException,
-    NetworkTimeoutException,
-    RequestBackoffException,
-    RequestUnauthorizedException,
-    RetryableException,
-    client_error_handler,
+    AuthenticationException,
+    OpenMoticsConnectionError,
+    OpenMoticsConnectionTimeoutError,
 )
 from .openmoticsgw.outputs import OpenMoticsOutputs
+from .openmoticsgw.sensors import OpenMoticsSensors
 
 
 class LocalGateway:
     """Docstring."""
 
-    _status: Optional[Status] = None
     _close_session: bool = False
-
-    _webhook_refresh_timer_task: Optional[asyncio.TimerHandle] = None
-    _webhook_url: Optional[str] = None
 
     def __init__(
         self,
@@ -51,12 +35,11 @@ class LocalGateway:
         localgw: str,
         *,
         request_timeout: int = 8,
-        session: Optional[aiohttp.client.ClientSession] = None,
+        session: Optional[aiohttp.client.ClientSession] | None = None,
         tls: bool = False,
         # verify_ssl: bool = False,
-        ssl_context: ssl.SSLContext = None,
+        ssl_context: ssl.SSLContext | None = None,
         port: int = 443,
-        user_agent: str | None = None,
     ) -> None:
         """Initialize connection with the OpenMotics LocalGateway API.
 
@@ -68,11 +51,9 @@ class LocalGateway:
             session: Optional, shared, aiohttp client session.
             tls: True, when TLS/SSL should be used.
             username: Username for HTTP auth, if enabled.
-            verify_ssl: Can be set to false, when TLS with self-signed cert is used.
+            ssl_context: ssl.SSLContext.
         """
-        self._session: aiohttp.client.ClientSession = session
-        self._close_session = False
-
+        self.session = session
         self.token = None
 
         self.localgw = localgw
@@ -84,11 +65,7 @@ class LocalGateway:
         # self.verify_ssl = verify_ssl
         self.ssl_context = ssl_context
 
-        self.user_agent = user_agent
-
-        if user_agent is None:
-            version = metadata.version(__package__)
-            self.user_agent = f"pyhaopenmotics/{version}"
+        self.user_agent = f"PyHAOpenMotics/{__version__}"
 
         self.auth = None
         if self.username and self.password:
@@ -96,20 +73,18 @@ class LocalGateway:
             self.auth = {"username": self.username, "password": self.password}
 
         self.outputs = OpenMoticsOutputs(self)
+        self.sensors = OpenMoticsSensors(self)
 
-    # @retry(
-    #     retry=retry_if_exception_type(RetryableException),
-    #     stop=(stop_after_delay(300) | stop_after_attempt(10)),
-    #     wait=wait_random_exponential(multiplier=1, max=30),
-    #     reraise=True,
-    # )
+    @backoff.on_exception(
+        backoff.expo, OpenMoticsConnectionError, max_tries=3, logger=None
+    )
     async def _request(
         self,
         path: str,
         *,
         method: str = aiohttp.hdrs.METH_POST,
-        data: dict = None,
-        **kwargs,
+        data: dict[str, Any] | None = None,
+        **kwargs: Any,
     ) -> Any:
         """Make post request using the underlying httpx AsyncClient.
 
@@ -118,14 +93,22 @@ class LocalGateway:
 
         Args:
             path: path
+            method: post
+            data: dict
             **kwargs: extra args
 
         Returns:
             response json or text
+
+        Raises:
+            OpenMoticsConnectionError: An error occurred while communitcation with
+                the OpenMotics API.
+            OpenMoticsConnectionTimeoutError: A timeout occurred while communicating
+                with the OpenMotics API.
+            AuthenticationException: raised when token is expired.
         """
-        scheme = "https" if self.tls else "http"
         url = URL.build(
-            scheme=scheme, host=self.localgw, port=self.port, path="/"
+            scheme="https", host=self.localgw, port=self.port, path="/"
         ).join(URL(path))
 
         headers = {
@@ -135,34 +118,36 @@ class LocalGateway:
 
         data = self.get_post_data(data)
 
-        if self._session is None:
-            self._session = aiohttp.ClientSession()
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
             self._close_session = True
 
         try:
             async with async_timeout.timeout(self.request_timeout):
-                resp = await self._session.request(
+                resp = await self.session.request(
                     method,
                     url,
-                    # auth=self.auth,
                     data=data,
                     # verify_ssl=self.verify_ssl,
                     ssl=self.ssl_context,
+                    headers=headers,
                     **kwargs,
                 )
 
             resp.raise_for_status()
 
         except asyncio.TimeoutError as exception:
-            raise ApiException(
+            raise OpenMoticsConnectionTimeoutError(
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
-        except (
-            ClientError,
-            ClientResponseError,
-            socket.gaierror,
-        ) as exception:
-            raise ApiException(
+        except ClientResponseError as exception:
+            if exception.status in [401, 403]:
+                raise AuthenticationException() from exception
+            raise OpenMoticsConnectionError(
+                "Error occurred while communicating with OpenMotics API."
+            ) from exception
+        except (socket.gaierror, ClientError) as exception:
+            raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
 
@@ -170,41 +155,61 @@ class LocalGateway:
             response_data = await resp.json()
             return response_data
 
-        return await resp.text()  # type: ignore
+        return await resp.text()
 
-    async def exec_action(self, path: str, data: dict = {}, **kwargs) -> dict[str, Any]:
+    async def exec_action(
+        self, path: str, data: dict[str, Any] | None = None, **kwargs: Any
+    ) -> Any:
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
             path: path
+            data: dict
             **kwargs: extra args
 
         Returns:
             response json or text
         """
-        if self.token == None:
-            self.login()
+        if self.token is None:
+            await self.login()
 
-        return await self._request(
-            path,
-            method=aiohttp.hdrs.METH_POST,
-            data=data,
-            **kwargs,
-        )
+        try:
+            # Try to execute the action.
+            return await self._request(
+                path,
+                method=aiohttp.hdrs.METH_POST,
+                data=data,
+                **kwargs,
+            )
+        except AuthenticationException:
+            # Get a new token and retry the action.
+            await self.login()
+            return await self._request(
+                path,
+                method=aiohttp.hdrs.METH_POST,
+                data=data,
+                **kwargs,
+            )
 
-    def get_post_data(self, data):
-        """Get the full post data dict, this method adds the token to the dict."""
+    def get_post_data(self, data: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Get the full post data dict, this method adds the token to the dict.
+
+        Args:
+            data: dict
+
+        Returns:
+            data with token added
+        """
         if data is not None:
-            d = data.copy()
+            dcopy = data.copy()
         else:
-            d = {}
-        if self.token != None:
-            d["token"] = self.token
-        return d
+            dcopy = {}
+        if self.token is not None:
+            dcopy["token"] = self.token
+        return dcopy
 
-    async def login(self):
+    async def login(self) -> None:
         """Login to the gateway: sets the token in the connector."""
-        print("in login")
         resp = await self._request(
             path="login",
             data=self.auth,
@@ -213,36 +218,53 @@ class LocalGateway:
         self.token = resp["token"]
         print(self.token)
 
-    # async def subscribe_webhook(self, installation_id: str, url: str) -> None:
-    #     """Register a webhook with OpenMotics for live updates."""
+    async def subscribe_webhook(self, installation_id: str) -> None:
+        """Register a webhook with OpenMotics for live updates.
 
-    #     # Register webhook
-    #     await self._request(
-    #         "/ws/events",
-    #         method=aiohttp.hdrs.METH_POST,
-    #         data={
-    #             "action": "set_subscription",
-    #             "types": ["OUTPUT_CHANGE", "SHUTTER_CHANGE", "THERMOSTAT_CHANGE", "THERMOSTAT_GROUP_CHANGE" ],
-    #             "installation_ids": [installation_id],
-    #         },
-    #     )
+        Args:
+            installation_id: int
 
-    # async def unsubscribe_webhook(self, installation_id: str) -> None:
-    #     """Delete all webhooks for this application ID."""
-    #     await self._request(
-    #         "/ws/events",
-    #         method=aiohttp.hdrs.METH_DELETE,
-    #     )
+        """
+        # Register webhook
+        await self._request(
+            "/ws/events",
+            method=aiohttp.hdrs.METH_POST,
+            data={
+                "action": "set_subscription",
+                "types": [
+                    "OUTPUT_CHANGE",
+                    "SHUTTER_CHANGE",
+                    "THERMOSTAT_CHANGE",
+                    "THERMOSTAT_GROUP_CHANGE",
+                ],
+                "installation_ids": [installation_id],
+            },
+        )
+
+    async def unsubscribe_webhook(self) -> None:
+        """Delete all webhooks for this application ID."""
+        await self._request(
+            "/ws/events",
+            method=aiohttp.hdrs.METH_DELETE,
+        )
 
     async def close(self) -> None:
         """Close open client session."""
-        if self._session and self._close_session:
-            await self._session.close()
+        if self.session and self._close_session:
+            await self.session.close()
 
-    async def __aenter__(self) -> OpenMoticsCloud:
-        """Async enter."""
+    async def __aenter__(self) -> LocalGateway:
+        """Async enter.
+
+        Returns:
+            LocalGateway: The LocalGateway object.
+        """
         return self
 
-    async def __aexit__(self, *exc_info) -> None:
-        """Async exit."""
+    async def __aexit__(self, *_exc_info: Any) -> None:
+        """Async exit.
+
+        Args:
+            *_exc_info: Exec type.
+        """
         await self.close()

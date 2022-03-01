@@ -22,7 +22,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
 
@@ -32,8 +32,8 @@ class OpenMoticsThermostats:  # noqa: SIM119
     async def set_mode(
         self,
         mode: str,
-    ) -> dict[str, Any]:
-        """Set a mode to all Groups the User has access to
+    ) -> Any:
+        """Set a mode to all Groups the User has access to.
 
         Args:
             mode: "HEATING|COOLING"
@@ -49,8 +49,8 @@ class OpenMoticsThermostats:  # noqa: SIM119
     async def set_state(
         self,
         state: str,
-    ) -> dict[str, Any]:
-        """Set a mode to all Groups the User has access to
+    ) -> Any:
+        """Set a mode to all Groups the User has access to.
 
         Args:
             state: "ON|OFF"
@@ -115,7 +115,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         self,
         thermostatgroup_id: int,
         mode: str,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Turn on a specified Output object.
 
         Args:
@@ -184,7 +184,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         self,
         thermostatunit_id: int,
         state: str,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Set state of a thermostatunit.
 
         Args:
@@ -203,7 +203,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         self,
         thermostatunit_id: int,
         temperature: float,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Set temperature of a thermostatunit.
 
         Args:
@@ -222,7 +222,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         self,
         thermostatunit_id: int,
         preset: str,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Set preset of a thermostatunit.
 
         Args:
@@ -237,7 +237,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         payload = {"preset": preset}
         return await self._omcloud.post(path, json=payload)
 
-    async def set_preset_config(
+    async def set_preset_config(  # pylint: disable=too-many-arguments
         self,
         thermostatunit_id: int,
         heating_away_temp: float,
@@ -246,12 +246,17 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         cooling_away_temp: float,
         cooling_vacation_temp: float,
         cooling_party_temp: float,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Set preset of a thermostatunit.
 
         Args:
-            thermostatunit_id: int
-            preset: "AUTO|AWAY|PARTY|VACATION"
+            thermostatunit_id: int,
+            heating_away_temp: float,
+            heating_vacation_temp: float,
+            heating_party_temp: float,
+            cooling_away_temp: float,
+            cooling_vacation_temp: float,
+            cooling_party_temp: float,
 
         Returns:
             Returns a thermostatunit with id

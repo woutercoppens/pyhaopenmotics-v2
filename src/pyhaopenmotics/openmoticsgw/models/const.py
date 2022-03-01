@@ -1,5 +1,5 @@
-"""
-Get a list of all modules attached and registered with the master.
+"""Get a list of all modules attached and registered with the master.
+
 :returns:
     'output': list of module types (O,R,D) and
     'input': list of input module types (I,T,L).
@@ -7,9 +7,8 @@ Get a list of all modules attached and registered with the master.
 OPENMOTICS_OUTPUT_TYPES = ["O", "R", "D"]
 OPENMOTICS_INPUT_TYPES = ["I", "T", "L"]
 
-"""
-https://wiki.openmotics.com/index.php/Modules
-"""
+
+# https://wiki.openmotics.com/index.php/Modules
 OPENMOTICS_OUTPUT_TYPE_TO_NAME = {
     0: "OUTLET",
     1: "VALVE",

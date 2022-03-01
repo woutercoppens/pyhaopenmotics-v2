@@ -1,41 +1,48 @@
 """Module containing the base of an output."""
-
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from pyhaopenmotics.helpers import merge_dicts
 from pyhaopenmotics.openmoticsgw.models.output import Output
 
-# from pydantic import parse_obj_as
-
-
-
 if TYPE_CHECKING:
-    from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
+    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
 
 
+@dataclass
 class OpenMoticsOutputs:  # noqa: SIM119
     """Object holding information of the OpenMotics outputs.
 
     All actions related to Outputs or a specific Output.
     """
 
-    def __init__(self, omcloud: OpenMoticsCloud) -> None:
+    def __init__(self, omcloud: LocalGateway) -> None:
         """Init the installations object.
 
         Args:
-            _omcloud: _omcloud
+            omcloud: LocalGateway
         """
         self._omcloud = omcloud
-        self._output_configs: list = None
+        self._output_configs: list[Any] = []
 
     @property
-    def output_configs(self):
+    def output_configs(self) -> list[Any]:
+        """Get a list of all output confs.
+
+        Returns:
+            list of all output confs
+        """
         return self._output_configs
 
     @output_configs.setter
-    def output_configs(self, output_configs: list):
+    def output_configs(self, output_configs: list[Any]) -> None:
+        """Set a list of all output confs.
+
+        Args:
+            output_configs: list
+        """
         self._output_configs = output_configs
 
     async def get_all(  # noqa: A003
@@ -50,7 +57,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Dict with all outputs
         """
-        if self.output_configs is None:
+        if len(self.output_configs) == 0:
             goc = await self._omcloud.exec_action("get_output_configurations")
             if goc["success"] is True:
                 self.output_configs = goc["config"]
@@ -60,9 +67,13 @@ class OpenMoticsOutputs:  # noqa: SIM119
 
         data = merge_dicts(self.output_configs, "status", status)
 
-        self._outputs = [Output.from_dict(device) for device in data]
+        outputs = [Output.from_dict(device) for device in data]
 
-        return self._outputs
+        if output_filter is not None:
+            # implemented later
+            pass
+
+        return outputs  # type: ignore
 
     async def get_by_id(
         self,
@@ -76,17 +87,15 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Returns a output with id
         """
-        _output: Output = None
         for output in await self.get_all():
             if output.idx == output_id:
-                _output = output
-
-        return _output
+                result = output
+        return result
 
     async def toggle(
         self,
         output_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Toggle a specified Output object.
 
         Args:
@@ -95,17 +104,16 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Returns a output with id
         """
-        _output = await self.get_by_id(output_id)
-        if _output.status.on == True:
+        output = await self.get_by_id(output_id)
+        if output.status.on is True:
             return await self.turn_off(output_id)
-        else:
-            return await self.turn_on(output_id)
+        return await self.turn_on(output_id)
 
     async def turn_on(
         self,
         output_id: int,
         value: int | None = 100,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Turn on a specified Output object.
 
         Args:
@@ -128,11 +136,10 @@ class OpenMoticsOutputs:  # noqa: SIM119
     async def turn_off(
         self,
         output_id: int,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Turn off a specified Output object.
 
         Args:
-            installation_id: int
             output_id: int
 
         Returns:

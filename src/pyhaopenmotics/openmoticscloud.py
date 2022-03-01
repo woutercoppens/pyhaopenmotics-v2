@@ -1,76 +1,58 @@
-"""Module containing a ThermostatClient for the Netatmo API."""
+"""Module containing a OpenMoticsCloud Client for the OpenMotics API."""
 
 from __future__ import annotations
 
 import asyncio
-import logging
 import socket
-from dataclasses import dataclass
-from importlib import metadata
-from importlib.abc import InspectLoader
-from typing import Any, Optional, TypedDict
+from collections.abc import Awaitable, Callable
+from typing import Any, Optional
 
 import aiohttp
 import async_timeout
-from aiohttp.client import ClientError, ClientResponseError
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    stop_after_delay,
-    wait_random_exponential,
-)
+import backoff
+from aiohttp.client import ClientError
 from yarl import URL
 
 from .__version__ import __version__
 from .cloud.groupactions import OpenMoticsGroupActions
 from .cloud.installations import OpenMoticsInstallations
 from .cloud.lights import OpenMoticsLights
+from .cloud.models.installation import Installation
 from .cloud.outputs import OpenMoticsOutputs
 from .cloud.sensors import OpenMoticsSensors
 from .cloud.shutters import OpenMoticsShutters
 from .cloud.thermostats import OpenMoticsThermostats
-from .const import CLOUD_API_AUTHORIZATION_URL, CLOUD_API_TOKEN_URL, CLOUD_API_VERSION
-from .errors import (
-    ApiException,
-    NetworkTimeoutException,
-    RequestBackoffException,
-    RequestUnauthorizedException,
-    RetryableException,
-    client_error_handler,
-)
+from .const import CLOUD_API_VERSION, CLOUD_BASE_URL
+from .errors import OpenMoticsConnectionError, OpenMoticsConnectionTimeoutError
 
 
 class OpenMoticsCloud:
     """Docstring."""
 
-    BASE_URL = "https://cloud.openmotics.com/api"
-
-    _installations: Optional[List[Installation]] = None
-    _status: Optional[Status] = None
+    _installations: Optional[list[Installation]] = None
     _close_session: bool = False
-
-    _webhook_refresh_timer_task: Optional[asyncio.TimerHandle] = None
-    _webhook_url: Optional[str] = None
 
     def __init__(
         self,
         token: str,
         *,
         request_timeout: int = 8,
-        session: Optional[aiohttp.client.ClientSession] = None,
+        session: Optional[aiohttp.client.ClientSession] | None = None,
         token_refresh_method: Optional[Callable[[], Awaitable[str]]] = None,
         installation_id: Optional[int] = None,
-        base_url: str = BASE_URL,
+        base_url: str = CLOUD_BASE_URL,
     ) -> None:
         """Initialize connection with the OpenMotics Cloud API.
 
         Args:
-            client_id: str
-            client_secret: str
-            **kwargs: other arguments
+            token: str
+            request_timeout: int
+            session: aiohttp.client.ClientSession
+            token_refresh_method: token refresh function
+            installation_id: int
+            base_url: str
         """
-        self._session: aiohttp.client.ClientSession = session
+        self.session = session
         self.token = None if token is None else token.strip()
         self._installation_id = installation_id
         self.base_url = base_url
@@ -88,25 +70,34 @@ class OpenMoticsCloud:
         self.thermostats = OpenMoticsThermostats(self)
 
     @property
-    def installation_id(self):
+    def installation_id(self) -> int | None:
+        """Get installation id.
+
+        Returns:
+            The installation id that will be used for this session.
+        """
         return self._installation_id
 
     @installation_id.setter
-    def installation_id(self, installation_id):
+    def installation_id(self, installation_id: int) -> None:
+        """Set installation id.
+
+        Args:
+            installation_id: The installation id that will be used
+                for this session.
+        """
         self._installation_id = installation_id
 
-    # @retry(
-    #     retry=retry_if_exception_type(RetryableException),
-    #     stop=(stop_after_delay(300) | stop_after_attempt(10)),
-    #     wait=wait_random_exponential(multiplier=1, max=30),
-    #     reraise=True,
-    # )
+    @backoff.on_exception(
+        backoff.expo, OpenMoticsConnectionError, max_tries=3, logger=None
+    )
     async def _request(
         self,
         path: str,
         *,
         method: str = aiohttp.hdrs.METH_GET,
-        **kwargs,
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
     ) -> Any:
         """Make post request using the underlying httpx AsyncClient.
 
@@ -115,18 +106,26 @@ class OpenMoticsCloud:
 
         Args:
             path: path
+            method: get of post
+            params: dict
             **kwargs: extra args
 
         Returns:
             response json or text
+
+        Raises:
+            OpenMoticsConnectionError: An error occurred while communitcation with
+                the OpenMotics API.
+            OpenMoticsConnectionTimeoutError: A timeout occurred while communicating
+                with the OpenMotics API.
         """
         if self.token_refresh_method is not None:
-            self.token = await self.get_token()
+            self.token = await self.token_refresh_method()
 
         url = str(URL(f"{self.base_url}/{CLOUD_API_VERSION}{path}"))
 
-        if self._session is None:
-            self._session = aiohttp.ClientSession()
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
             self._close_session = True
 
         headers = {
@@ -135,27 +134,32 @@ class OpenMoticsCloud:
             "Accept": "application/json",
         }
 
+        if params:
+            for key, value in params.items():
+                if isinstance(value, bool):
+                    params[key] = str(value).lower()
+
         try:
             async with async_timeout.timeout(self.request_timeout):
-                resp = await self._session.request(
+                resp = await self.session.request(
                     method,
                     url,
                     headers=headers,
+                    params=params,
                     **kwargs,
                 )
 
             resp.raise_for_status()
 
         except asyncio.TimeoutError as exception:
-            raise ApiException(
+            raise OpenMoticsConnectionTimeoutError(
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
         except (
             ClientError,
-            ClientResponseError,
             socket.gaierror,
         ) as exception:
-            raise ApiException(
+            raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
 
@@ -163,25 +167,26 @@ class OpenMoticsCloud:
             response_data = await resp.json()
             return response_data
 
-        return await resp.text()  # type: ignore
+        return await resp.text()
 
-    async def get(self, path: str, **kwargs) -> dict[str, Any]:
+    async def get(self, path: str, **kwargs: Any) -> Any:
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
-            path: path
-            **kwargs: extra args
+            path: string
+            **kwargs: any
 
         Returns:
             response json or text
         """
-        return await self._request(
+        response = await self._request(
             path,
             method=aiohttp.hdrs.METH_GET,
             **kwargs,
         )
+        return response
 
-    async def post(self, path: str, **kwargs) -> dict[str, Any]:
+    async def post(self, path: str, **kwargs: Any) -> Any:
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
@@ -191,15 +196,20 @@ class OpenMoticsCloud:
         Returns:
             response json or text
         """
-        return await self._request(
+        response = await self._request(
             path,
             method=aiohttp.hdrs.METH_POST,
             **kwargs,
         )
+        return response
 
-    async def subscribe_webhook(self, installation_id: str, url: str) -> None:
-        """Register a webhook with OpenMotics for live updates."""
+    async def subscribe_webhook(self, installation_id: int) -> None:
+        """Register a webhook with OpenMotics for live updates.
 
+        Args:
+            installation_id: int
+
+        """
         # Register webhook
         await self._request(
             "/ws/events",
@@ -216,7 +226,7 @@ class OpenMoticsCloud:
             },
         )
 
-    async def unsubscribe_webhook(self, installation_id: str) -> None:
+    async def unsubscribe_webhook(self) -> None:
         """Delete all webhooks for this application ID."""
         await self._request(
             "/ws/events",
@@ -225,13 +235,21 @@ class OpenMoticsCloud:
 
     async def close(self) -> None:
         """Close open client session."""
-        if self._session and self._close_session:
-            await self._session.close()
+        if self.session and self._close_session:
+            await self.session.close()
 
     async def __aenter__(self) -> OpenMoticsCloud:
-        """Async enter."""
+        """Async enter.
+
+        Returns:
+            OpenMoticsCloud: The OpenMoticsCloud object.
+        """
         return self
 
-    async def __aexit__(self, *exc_info) -> None:
-        """Async exit."""
+    async def __aexit__(self, *_exc_info: Any) -> None:
+        """Async exit.
+
+        Args:
+            *_exc_info: Exec type.
+        """
         await self.close()

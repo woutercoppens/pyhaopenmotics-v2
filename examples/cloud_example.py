@@ -1,21 +1,17 @@
 #!/usr/bin/env python3
 # noqa: E800
-
-"""
-Cloud example.
+"""Cloud example.
 
 How to use this script:
     export CLIENT_ID="dnfqsdfjqsjfqsdjfqf"
     export CLIENT_SECRET="djfqsdkfjqsdkfjqsdkfjqsdkfjkqsdjfkjdkfqjdskf"
     python cloud_example.py
 """
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
-
-# import imp
-import aiohttp
-from yarl import URL
 
 try:
     from dotenv import load_dotenv
@@ -23,21 +19,17 @@ except ModuleNotFoundError as exc:
     raise ImportError("You have to run 'pip install python-dotenv' first") from exc
 
 try:
-    from authlib.integrations.httpx_client import (  # type: ignore
-        AsyncOAuth2Client,
-        OAuthError,
-    )
+    from authlib.integrations.httpx_client import AsyncOAuth2Client
 except ModuleNotFoundError as exc:
     raise ImportError("You have to run 'pip install authlib' first") from exc
 
-import aiohttp
-from oauthlib.oauth2 import BackendApplicationClient
 
 from pyhaopenmotics import OpenMoticsCloud
 from pyhaopenmotics.const import (
     CLOUD_API_AUTHORIZATION_URL,
     CLOUD_API_TOKEN_URL,
     CLOUD_API_VERSION,
+    CLOUD_BASE_URL,
     SCOPE,
 )
 
@@ -56,74 +48,64 @@ load_dotenv()
 client_id = os.environ["CLIENT_ID"]
 client_secret = os.environ["CLIENT_SECRET"]
 
-token_url = "https://cloud.openmotics.com:443/api/v1/authentication/oauth2/token"
-authorize_url = (
-    "https://cloud.openmotics.com:443/api/v1/authentication/oauth2/authorize"
-)
-base_url = "https://cloud.openmotics.com:443/api/v1"
+base_url = f"{CLOUD_BASE_URL}/{CLOUD_API_VERSION}"
+
+token_url = f"{base_url}{CLOUD_API_TOKEN_URL}"
+authorize_url = f"{base_url}{CLOUD_API_AUTHORIZATION_URL}"
 
 
-async def main():
+async def main() -> None:
+    """Docstring."""
+
     token = None
 
-    client = BackendApplicationClient(client_id=client_id)
     async with AsyncOAuth2Client(
         client_id=client_id,
         client_secret=client_secret,
-        token_endpoint_auth_method="client_secret_post",  # nosec
+        token_endpoint_auth_method="client_secret_post",  # noqa # nosec
         scope=SCOPE,
         token_endpoint=token_url,
         grant_type="client_credentials",
-        # update_token=self.token_saver,
     ) as httpx_session:
-        token = await async_get_token(httpx_session)
-        await async_call_api(token)
 
+        token = await httpx_session.fetch_token(
+            url=token_url,
+            grant_type="client_credentials",
+        )
+        access_token = token.get("access_token")
+        print(access_token)
 
-async def async_get_token(httpx_session):
-    tkn = await httpx_session.fetch_token(
-        url=token_url,
-        grant_type="client_credentials",
-    )
-    token = tkn.get("access_token")
-    print(token)
-    return token
+        omclient = OpenMoticsCloud(token=access_token)
 
+        installations = await omclient.installations.get_all()
+        print(installations)
 
-async def async_call_api(token):
-    print(f"async_call_api: {token}")
+        i_id = installations[0].idx
 
-    omclient = OpenMoticsCloud(token=token)
+        installation = await omclient.installations.get_by_id(i_id)
+        print(installation)
+        omclient.installation_id = i_id
+        print(installation.idx)
+        print(installation.name)
 
-    installations = await omclient.installations.get_all()
-    print(installations)
+        outputs = await omclient.outputs.get_all()
+        print(outputs)
 
-    i_id = installations[0].idx
+        print(outputs[0])
 
-    installation = await omclient.installations.get_by_id(i_id)
-    print(installation)
-    omclient.installation_id = i_id
-    # print(installation.idx)
-    # print(installation.name)
+        sensors = await omclient.sensors.get_all()
+        print(sensors)
 
-    outputs = await omclient.outputs.get_all()
-    print(outputs)
+        gaga = await omclient.groupactions.get_all()
+        print(gaga)
 
-    print(outputs[0])
+        tgga = await omclient.thermostats.groups.get_all()
+        print(tgga)
 
-    sensors = await omclient.sensors.get_all()
-    print(sensors)
+        tuga = await omclient.thermostats.units.get_all()
+        print(tuga)
 
-    ga = await omclient.groupactions.get_all()
-    print(ga)
-
-    tg = await omclient.thermostats.groups.get_all()
-    print(tg)
-
-    tu = await omclient.thermostats.units.get_all()
-    print(tu)
-
-    await omclient.close()
+        await omclient.close()
 
 
 if __name__ == "__main__":
