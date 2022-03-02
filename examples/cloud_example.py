@@ -21,7 +21,7 @@ except ModuleNotFoundError as exc:
 try:
     from authlib.integrations.httpx_client import AsyncOAuth2Client
 except ModuleNotFoundError as exc:
-    raise ImportError("You have to run 'pip install authlib' first") from exc
+    raise ImportError("You have to run 'pip install httpx authlib' first") from exc
 
 
 from pyhaopenmotics import OpenMoticsCloud
