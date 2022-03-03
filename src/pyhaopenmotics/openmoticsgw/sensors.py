@@ -61,23 +61,10 @@ class OpenMoticsSensors:  # noqa: SIM119
             if goc["success"] is True:
                 self.sensor_configs = goc["config"]
 
-        sensor_brightness_status = await self._omcloud.exec_action(
-            "get_sensor_brightness_status"
-        )
-        brightness_status = sensor_brightness_status["status"]
-        print(brightness_status)
-        sensor_humidity_status = await self._omcloud.exec_action(
-            "get_sensor_humidity_status"
-        )
-        humidity_status = sensor_humidity_status["status"]
-        sensor_temperature_status = await self._omcloud.exec_action(
-            "get_sensor_temperature_status"
-        )
-        temperature_status = sensor_temperature_status["status"]
+        sensors_status = await self._omcloud.exec_action("get_sensor_status")
+        status = sensors_status["status"]
 
-        data0 = merge_dicts(self.sensor_configs, "status", brightness_status)
-        data1 = merge_dicts(data0, "status", humidity_status)
-        data = merge_dicts(data1, "status", temperature_status)
+        data = merge_dicts(self.sensor_configs, "status", status)
 
         sensors = [Sensor.from_dict(device) for device in data]
 
