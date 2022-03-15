@@ -8,10 +8,13 @@ from .errors import (
 from .localgateway import LocalGateway
 from .openmoticscloud import OpenMoticsCloud
 
+from .cloud.models import Installation
+
 __all__ = [
     "OpenMoticsCloud",
     "LocalGateway",
     "OpenMoticsError",
     "OpenMoticsConnectionError",
     "OpenMoticsConnectionTimeoutError",
+    "Installation",
 ]

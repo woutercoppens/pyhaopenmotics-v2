@@ -49,7 +49,6 @@ class OpenMoticsSensors:  # noqa: SIM119
         else:
             body = await self._omcloud.get(path)
 
-        # return [sensor(**sensor) for sensor in body["data"]]  # type: ignore
         return parse_obj_as(list[Sensor], body["data"])
 
     async def get_by_id(

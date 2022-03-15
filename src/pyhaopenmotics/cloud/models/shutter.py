@@ -70,7 +70,7 @@ class Shutter(BaseModel):
     local_id: Optional[int]
     name: str
     shutter_type: str = Field(..., alias="type")
-    capabilities: Optional[dict[str, Any]]
+    capabilities: Optional[list[Any]]
     status: Status
     location: Optional[Location]
     attributes: Optional[Attributes]

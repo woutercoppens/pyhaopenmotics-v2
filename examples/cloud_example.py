@@ -30,7 +30,7 @@ from pyhaopenmotics.const import (
     CLOUD_API_TOKEN_URL,
     CLOUD_API_VERSION,
     CLOUD_BASE_URL,
-    SCOPE,
+    CLOUD_SCOPE,
 )
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
@@ -63,7 +63,7 @@ async def main() -> None:
         client_id=client_id,
         client_secret=client_secret,
         token_endpoint_auth_method="client_secret_post",  # noqa # nosec
-        scope=SCOPE,
+        scope=CLOUD_SCOPE,
         token_endpoint=token_url,
         grant_type="client_credentials",
     ) as httpx_session:
