@@ -1,5 +1,6 @@
 """Module HTTP communication with the OpenMotics API."""
 
+from .cloud.models import Installation
 from .errors import (
     OpenMoticsConnectionError,
     OpenMoticsConnectionTimeoutError,
@@ -7,8 +8,6 @@ from .errors import (
 )
 from .localgateway import LocalGateway
 from .openmoticscloud import OpenMoticsCloud
-
-from .cloud.models import Installation
 
 __all__ = [
     "OpenMoticsCloud",
