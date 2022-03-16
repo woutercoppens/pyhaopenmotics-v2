@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from pyhaopenmotics.helpers import merge_dicts
 from pyhaopenmotics.openmoticsgw.models.output import Output
@@ -78,7 +78,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
     async def get_by_id(
         self,
         output_id: int,
-    ) -> Output:
+    ) -> Optional[Output]:
         """Get output by id.
 
         Args:
@@ -89,8 +89,8 @@ class OpenMoticsOutputs:  # noqa: SIM119
         """
         for output in await self.get_all():
             if output.idx == output_id:
-                result = output
-        return result
+                return output
+        return None
 
     async def toggle(
         self,
@@ -104,10 +104,14 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
             Returns a output with id
         """
-        output = await self.get_by_id(output_id)
-        if output.status.on is True:
-            return await self.turn_off(output_id)
-        return await self.turn_on(output_id)
+        if (output := await self.get_by_id(output_id)) is None:
+            return None
+        try:
+            if output.status.on is True:
+                return await self.turn_off(output_id)
+            return await self.turn_on(output_id)
+        except (AttributeError, KeyError):
+            return None
 
     async def turn_on(
         self,

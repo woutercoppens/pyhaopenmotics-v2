@@ -1,5 +1,7 @@
 """Asynchronous client for the OpenMotics API."""
+# flake8: noqa
 # pylint: disable=protected-access
+# # mypy: ignore-errors
 import asyncio
 
 import aiohttp
@@ -63,10 +65,10 @@ get_installations_data_request = {
 
 
 @pytest.mark.asyncio
-async def test_timeout(aresponses) -> None:
+async def test_timeout(aresponses) -> None:  # type: ignore
     """Test request timeout."""
     # Faking a timeout by sleeping
-    async def response_handler(_):
+    async def response_handler(_):  # type: ignore
         await asyncio.sleep(2)
         return aresponses.Response(body="Goodmorning!")
 
@@ -83,7 +85,7 @@ async def test_timeout(aresponses) -> None:
 
 
 @pytest.mark.asyncio
-async def test_http_error400(aresponses) -> None:
+async def test_http_error400(aresponses) -> None:  # type: ignore
     """Test HTTP 404 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,
@@ -99,7 +101,7 @@ async def test_http_error400(aresponses) -> None:
 
 
 @pytest.mark.asyncio
-async def test_http_error500(aresponses) -> None:
+async def test_http_error500(aresponses) -> None:  # type: ignore
     """Test HTTP 500 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,

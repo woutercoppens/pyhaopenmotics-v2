@@ -1,6 +1,7 @@
 ---
 ignore: |
-  .github/workflows
+  .github
+  .pre-commit-config.yaml
 rules:
   braces:
     level: error

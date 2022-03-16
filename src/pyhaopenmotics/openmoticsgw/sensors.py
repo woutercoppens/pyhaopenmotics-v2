@@ -1,8 +1,8 @@
-"""Module containing the base of an output."""
+"""Module containing the base of an sensor."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from pyhaopenmotics.helpers import merge_dicts
 from pyhaopenmotics.openmoticsgw.models.sensor import Sensor
@@ -77,7 +77,7 @@ class OpenMoticsSensors:  # noqa: SIM119
     async def get_by_id(
         self,
         sensor_id: int,
-    ) -> Sensor:
+    ) -> Optional[Sensor]:
         """Get sensor by id.
 
         Args:
@@ -88,6 +88,5 @@ class OpenMoticsSensors:  # noqa: SIM119
         """
         for sensor in await self.get_all():
             if sensor.idx == sensor_id:
-                result = sensor
-
-        return result
+                return sensor
+        return None
