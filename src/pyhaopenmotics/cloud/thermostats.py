@@ -159,8 +159,6 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
 
         body = await self._omcloud.get(path)
 
-        print(body["data"])
-
         return parse_obj_as(list[ThermostatUnit], body["data"])
 
     async def get_by_id(

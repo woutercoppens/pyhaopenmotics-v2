@@ -19,8 +19,12 @@ from .errors import (
     OpenMoticsConnectionError,
     OpenMoticsConnectionTimeoutError,
 )
+from .openmoticsgw.groupactions import OpenMoticsGroupActions
+from .openmoticsgw.lights import OpenMoticsLights
 from .openmoticsgw.outputs import OpenMoticsOutputs
 from .openmoticsgw.sensors import OpenMoticsSensors
+from .openmoticsgw.shutters import OpenMoticsShutters
+from .openmoticsgw.thermostats import OpenMoticsThermostats
 
 
 class LocalGateway:
@@ -74,6 +78,11 @@ class LocalGateway:
 
         self.outputs = OpenMoticsOutputs(self)
         self.sensors = OpenMoticsSensors(self)
+        self.groupactions = OpenMoticsGroupActions(self)
+        self.shutters = OpenMoticsShutters(self)
+        self.thermostats = OpenMoticsThermostats(self)
+        # implemented to be compatible with cloud
+        self.lights = OpenMoticsLights(self)
 
     @backoff.on_exception(
         backoff.expo, OpenMoticsConnectionError, max_tries=3, logger=None

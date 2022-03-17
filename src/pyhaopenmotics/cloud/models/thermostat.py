@@ -126,7 +126,7 @@ class ThermostatGroup(BaseModel):
 
 
 class ThermostatUnit(BaseModel):
-    """Class holding an OpenMotics ThermostatGroup .
+    """Class holding an OpenMotics ThermostatUnit.
 
     # noqa: E800
     # {

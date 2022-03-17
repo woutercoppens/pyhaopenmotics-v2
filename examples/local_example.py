@@ -5,15 +5,21 @@
 How to use this script:
     pip install python-dotenv
     export LOCALGW='192.168.0.2'
-    export USERNAME="dnfqsdfjqsjfqsdjfqf"
+    export USER_NAME="dnfqsdfjqsjfqsdjfqf"
     export PASSWORD="djfqsdkfjqsdkfjqsdkfjqsdkfjkqsdjfkjdkfqjdskf"
+    export TLS=True
     python cloud_example.py
 """
+from __future__ import annotations
+
 import asyncio
 import os
 import ssl
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError as exc:
+    raise ImportError("You have to run 'pip install python-dotenv' first") from exc
 
 from pyhaopenmotics import LocalGateway
 
@@ -68,10 +74,22 @@ async def main() -> None:
         output_0 = await omclient.outputs.get_by_id(0)
         print(output_0)
 
-        await omclient.outputs.toggle(0)
+        # await omclient.outputs.toggle(0)
 
         sensors = await omclient.sensors.get_all()
         print(sensors)
+
+        shutters = await omclient.shutters.get_all()
+        print(shutters)
+
+        gaga = await omclient.groupactions.get_all()
+        print(gaga)
+
+        tgga = await omclient.thermostats.groups.get_all()
+        print(tgga)
+
+        tuga = await omclient.thermostats.units.get_all()
+        print(tuga)
 
         await omclient.close()
 

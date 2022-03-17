@@ -6,16 +6,16 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import parse_obj_as
 
-from pyhaopenmotics.cloud.models.shutter import Shutter
+from .models.shutter import Shutter
 
 if TYPE_CHECKING:
     from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
 
 
 class OpenMoticsShutters:  # noqa: SIM119
-    """Object holding information of the OpenMotics outputs.
+    """Object holding information of the OpenMotics shutters.
 
-    All actions related to Outputs or a specific Output.
+    All actions related to Shutters or a specific Shutter.
     """
 
     def __init__(self, omcloud: OpenMoticsCloud) -> None:

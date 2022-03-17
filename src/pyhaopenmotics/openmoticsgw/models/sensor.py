@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from pyhaopenmotics.openmoticsgw.models.location import Location
+from .location import Location
 
 
 @dataclass

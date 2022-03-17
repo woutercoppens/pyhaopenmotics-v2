@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Optional
 
 from pyhaopenmotics.helpers import merge_dicts
-from pyhaopenmotics.openmoticsgw.models.output import Output
+
+from .models.output import Output
 
 if TYPE_CHECKING:
     from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
@@ -55,7 +56,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
             output_filter: str
 
         Returns:
-            Dict with all outputs
+            list with all outputs
         """
         if len(self.output_configs) == 0:
             goc = await self._omcloud.exec_action("get_output_configurations")

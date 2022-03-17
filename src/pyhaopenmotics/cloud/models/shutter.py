@@ -1,4 +1,4 @@
-"""Output Model for the OpenMotics API."""
+"""Shutter Model for the OpenMotics API."""
 from __future__ import annotations
 
 from typing import Any, Optional

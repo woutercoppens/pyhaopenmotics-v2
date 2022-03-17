@@ -1,17 +1,16 @@
 """Directory holding openmoticsgw."""
-# from .groupactions import OpenMoticsGroupActions
-# from .lights import OpenMoticsLights
+from .groupactions import OpenMoticsGroupActions
+from .lights import OpenMoticsLights
 from .outputs import OpenMoticsOutputs
 from .sensors import OpenMoticsSensors
-
-# from .shutters import OpenMoticsShutters
-# from .thermostats import OpenMoticsThermostats
+from .shutters import OpenMoticsShutters
+from .thermostats import OpenMoticsThermostats
 
 __all__ = [
     "OpenMoticsOutputs",
-    # "OpenMoticsGroupActions",
-    # "OpenMoticsShutters",
-    # "OpenMoticsLights",
+    "OpenMoticsGroupActions",
+    "OpenMoticsShutters",
     "OpenMoticsSensors",
-    # "OpenMoticsThermostats",
+    "OpenMoticsThermostats",
+    "OpenMoticsLights",
 ]
