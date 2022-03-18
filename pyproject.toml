@@ -29,38 +29,37 @@ python = "^3.9"
 aiohttp = ">=3.8.1"
 yarl = ">=1.6.0"
 backoff = ">=1.9.0"
-pydantic = "^1.9.0"
+pydantic = "^1.9"
 
 [tool.poetry.dev-dependencies]
 aresponses = "^2.1.5"
+bandit = "1.7.4"
 black = "^22.1"
 blacken-docs = "^1.12.1"
+codespell = "^2.1.0"
 coverage = {version = "^6.3", extras = ["toml"]}
+darglint = "^1.8.1"
 flake8 = "^4.0.1"
-flake8-docstrings = "^1.6.0"
-isort = "^5.10.1"
-mypy = "^0.941"
-pre-commit = "^2.17.0"
-pre-commit-hooks = "^4.1.0"
-pylint = "^2.12.2"
-pytest = "^7.1.1"
-pyright = "^1.1.230"
-pytest-asyncio = "^0.18.2"
-pytest-cov = "^3.0.0"
-yamllint = "^1.26.3"
-pyupgrade = "^2.31.1"
-flake8-simplify = "^0.18.1"
-vulture = "^2.3"
 flake8-bandit = "^3.0.0"
 flake8-bugbear = "^22.1.11"
 flake8-builtins = "^1.5.3"
 flake8-comprehensions = "^3.8.0"
+flake8-docstrings = "^1.5.0"
 flake8-eradicate = "^1.2.0"
 flake8-markdown = "^0.3.0"
-darglint = "^1.8.1"
+flake8-simplify = "^0.18.1"
+isort = "^5.10.1"
+mypy = "^0.941"
+pre-commit = "^2.16.0"
+pre-commit-hooks = "^4.1.0"
+pylint = "^2.12.2"
+pytest = "^7.1.1"
+pytest-asyncio = "^0.18.2"
+pytest-cov = "^3.0.0"
+pyupgrade = "^2.31.1"
 safety = "^1.10.3"
-codespell = "^2.1.0"
-bandit = "^1.7.4"
+vulture = "^2.3"
+yamllint = "^1.26.3"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/woutercoppens/pyhaopenmotics/issues"
@@ -71,7 +70,7 @@ targets = ["src"]
 skips = ["B101", "B110", "B106"]
 
 [tool.black]
-target-version = ["py39", "py310"]
+target-version = ["py39"]
 
 [tool.coverage.paths]
 source = ["src"]
@@ -176,6 +175,9 @@ ignore-imports = true
 
 [tool.pylint.FORMAT]
 max-line-length=88
+
+[tool.pyright]
+include = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
