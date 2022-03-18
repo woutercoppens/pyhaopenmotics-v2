@@ -41,7 +41,6 @@ class LocalGateway:
         request_timeout: int = 8,
         session: Optional[aiohttp.client.ClientSession] | None = None,
         tls: bool = False,
-        # verify_ssl: bool = False,
         ssl_context: ssl.SSLContext | None = None,
         port: int = 443,
     ) -> None:
@@ -66,7 +65,6 @@ class LocalGateway:
         self.request_timeout = request_timeout
         self.tls = tls
         self.username = username
-        # self.verify_ssl = verify_ssl
         self.ssl_context = ssl_context
 
         self.user_agent = f"PyHAOpenMotics/{__version__}"
@@ -81,8 +79,7 @@ class LocalGateway:
         self.groupactions = OpenMoticsGroupActions(self)
         self.shutters = OpenMoticsShutters(self)
         self.thermostats = OpenMoticsThermostats(self)
-        # implemented to be compatible with cloud
-        self.lights = OpenMoticsLights(self)
+        self.lights = OpenMoticsLights(self)  # implemented to be compatible with cloud
 
     @backoff.on_exception(
         backoff.expo, OpenMoticsConnectionError, max_tries=3, logger=None
@@ -137,7 +134,6 @@ class LocalGateway:
                     method,
                     url,
                     data=data,
-                    # verify_ssl=self.verify_ssl,
                     ssl=self.ssl_context,
                     headers=headers,
                     **kwargs,
@@ -152,6 +148,7 @@ class LocalGateway:
         except ClientResponseError as exception:
             if exception.status in [401, 403]:
                 raise AuthenticationException() from exception
+                # and try to fetch a new token
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception

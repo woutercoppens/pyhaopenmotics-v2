@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
-from .location import Location
 
 
 @dataclass
@@ -28,8 +27,8 @@ class GroupLocation:
             thermostat_group_id=data.get("thermostat_group_id", 0),
             installation_id=data.get("installation_id", 0),
             room_id=data.get("room_id", 0),
-
         )
+
 
 @dataclass
 class UnitLocation:
@@ -53,8 +52,8 @@ class UnitLocation:
             thermostat_group_id=data.get("thermostat_group_id", 0),
             installation_id=data.get("installation_id", 0),
             room_id=data.get("room_id", 0),
-
         )
+
 
 @dataclass
 class GroupStatus:
@@ -77,6 +76,7 @@ class GroupStatus:
             mode=data.get("mode", "None"),
             state=data.get("state", False),
         )
+
 
 @dataclass
 class UnitStatus:
@@ -106,6 +106,7 @@ class UnitStatus:
             preset=data.get("preset", "None"),
         )
 
+
 @dataclass
 class Presets:
     """Class holding the status."""
@@ -130,6 +131,7 @@ class Presets:
             vacation=data.get("vacation", "None"),
         )
 
+
 @dataclass
 class Schedule:
     """Class holding the Schedule."""
@@ -151,6 +153,7 @@ class Schedule:
             data=data.get("data", "None"),
             start=data.get("start", "None"),
         )
+
 
 @dataclass
 class ConfigurationPreset:
@@ -201,6 +204,7 @@ class Allowed:
             allowed=data.get("allowed", False),
         )
 
+
 @dataclass
 class Acl:
     """Class holding the Acl."""
@@ -221,8 +225,8 @@ class Acl:
         return Acl(
             set_state=Allowed.from_dict(data),
             set_mode=Allowed.from_dict(data),
-
         )
+
 
 @dataclass
 class Configuration:
@@ -246,21 +250,21 @@ class Configuration:
             cooling=ConfigurationPreset.from_dict(data),
         )
 
+
 @dataclass
 class ThermostatGroup:
     """Class holding an OpenMotics ThermostatGroup."""
 
     # pylint: disable=too-many-instance-attributes
-    idx: int 
+    idx: int
     local_id: int
     name: str
     schedule: Schedule
     capabilities: list[Any]
-    version: str 
+    version: str
     thermostat_ids: dict[str, Any]
     status: GroupStatus
     acl: Acl
-
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> ThermostatGroup | None:
@@ -276,10 +280,10 @@ class ThermostatGroup:
         status = GroupStatus.from_dict({})
         if "status" in data:
             status = GroupStatus.from_dict(data.get("status", {}))
-        
+
         # placeholders
-        capabilities = ['None']
-        thermostat_ids = {'ids': 'None'}
+        capabilities = ["None"]
+        thermostat_ids = {"ids": "None"}
 
         return ThermostatGroup(
             idx=data.get("id", 0),
@@ -302,12 +306,13 @@ class ThermostatGroup:
         """
         return f"{self.idx}_{self.name}"
 
+
 @dataclass
 class ThermostatUnit:
     """Class holding an OpenMotics ThermostatUnit."""
 
     # pylint: disable=too-many-instance-attributes
-    idx: int 
+    idx: int
     local_id: int
     name: str
     location: UnitLocation
@@ -329,9 +334,6 @@ class ThermostatUnit:
         status = UnitStatus.from_dict({})
         if "status" in data:
             status = UnitStatus.from_dict(data.get("status", {}))
-        
-        capabilities = [""]
-        thermostat_ids = {""}
 
         return ThermostatUnit(
             idx=data.get("id", 0),

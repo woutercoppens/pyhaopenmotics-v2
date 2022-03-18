@@ -25,13 +25,7 @@ except ModuleNotFoundError as exc:
 
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.const import (
-    CLOUD_API_AUTHORIZATION_URL,
-    CLOUD_API_TOKEN_URL,
-    CLOUD_API_VERSION,
-    CLOUD_BASE_URL,
-    CLOUD_SCOPE,
-)
+from pyhaopenmotics.const import CLOUD_SCOPE, OAUTH2_TOKEN
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
 log = logging.getLogger()
@@ -48,10 +42,10 @@ load_dotenv()
 client_id = os.environ["CLIENT_ID"]
 client_secret = os.environ["CLIENT_SECRET"]
 
-base_url = f"{CLOUD_BASE_URL}/{CLOUD_API_VERSION}"
+# base_url = f"{CLOUD_BASE_URL}/{CLOUD_API_VERSION}"
 
-token_url = f"{base_url}{CLOUD_API_TOKEN_URL}"
-authorize_url = f"{base_url}{CLOUD_API_AUTHORIZATION_URL}"
+# token_url = f"{base_url}{CLOUD_API_TOKEN_URL}"
+# authorize_url = f"{base_url}{CLOUD_API_AUTHORIZATION_URL}"
 
 
 async def main() -> None:
@@ -59,17 +53,19 @@ async def main() -> None:
 
     token = None
 
+    print(OAUTH2_TOKEN)
+
     async with AsyncOAuth2Client(
         client_id=client_id,
         client_secret=client_secret,
         token_endpoint_auth_method="client_secret_post",  # noqa # nosec
         scope=CLOUD_SCOPE,
-        token_endpoint=token_url,
+        token_endpoint=OAUTH2_TOKEN,
         grant_type="client_credentials",
     ) as httpx_session:
 
         token = await httpx_session.fetch_token(
-            url=token_url,
+            url=OAUTH2_TOKEN,
             grant_type="client_credentials",
         )
         access_token = token.get("access_token")

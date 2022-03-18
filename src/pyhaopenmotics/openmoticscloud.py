@@ -22,7 +22,7 @@ from .cloud.outputs import OpenMoticsOutputs
 from .cloud.sensors import OpenMoticsSensors
 from .cloud.shutters import OpenMoticsShutters
 from .cloud.thermostats import OpenMoticsThermostats
-from .const import CLOUD_API_VERSION, CLOUD_BASE_URL
+from .const import CLOUD_API_URL
 from .errors import OpenMoticsConnectionError, OpenMoticsConnectionTimeoutError
 
 
@@ -40,7 +40,7 @@ class OpenMoticsCloud:
         session: Optional[aiohttp.client.ClientSession] | None = None,
         token_refresh_method: Optional[Callable[[], Awaitable[str]]] = None,
         installation_id: Optional[int] = None,
-        base_url: str = CLOUD_BASE_URL,
+        base_url: str = CLOUD_API_URL,
     ) -> None:
         """Initialize connection with the OpenMotics Cloud API.
 
@@ -122,7 +122,7 @@ class OpenMoticsCloud:
         if self.token_refresh_method is not None:
             self.token = await self.token_refresh_method()
 
-        url = str(URL(f"{self.base_url}/{CLOUD_API_VERSION}{path}"))
+        url = str(URL(f"{self.base_url}{path}"))
 
         if self.session is None:
             self.session = aiohttp.ClientSession()

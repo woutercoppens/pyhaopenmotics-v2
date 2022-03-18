@@ -138,7 +138,6 @@ class OpenMoticsShutters:  # noqa: SIM119
         data = {"id": shutter_id}
         return await self._omcloud.exec_action("do_shutter_stop", data=data)
 
-
     async def change_position(
         self,
         shutter_id: int,
@@ -159,95 +158,3 @@ class OpenMoticsShutters:  # noqa: SIM119
         """
         data = {"id": shutter_id, "position": position}
         return await self._omcloud.exec_action("do_shutter_goto", data=data)
-
-
-    async def change_relative_position(
-        self,
-        shutter_id: int,
-        offset: int,
-    ) -> Any:
-        """Change the relative position of the specified Shutter.
-
-        The offset can be set from -steps (excluded) to steps (excluded).
-        The steps value can be found in the configuration field of a Shutter.
-        Not all gateways or shutters support this feature.
-
-        Args:
-            shutter_id: int
-            offset: int (in body)
-
-        Returns:
-            Returns a shutter with id
-        """
-        return None
-
-    async def lock(
-        self,
-        shutter_id: int,
-    ) -> Any:
-        """Lock the specified Shutter to prevent future movements.
-
-        The behavior is depending of the capabilities of the Shutter:
-            LOCAL_LOCK capability: this lock is a hardware lock, without manual
-            override through a local interface.
-            CLOUD_LOCK capability: this lock is a software lock in the cloud,
-            thus you can still move the shutter through a local interface.
-
-
-        Args:
-            shutter_id: int
-
-        Returns:
-            Returns the lock_type as response.
-        """
-        return None
-
-    async def unlock(
-        self,
-        shutter_id: int,
-    ) -> Any:
-        """Undo the lock action of the specified Shutter.
-
-        Args:
-            shutter_id: int
-
-        Returns:
-            Returns a shutter with id
-        """
-        return None
-
-    async def preset(
-        self,
-        shutter_id: int,
-        position: int,
-    ) -> Any:
-        """Change the preset position of the specified Shutter.
-
-        The position can be set from 0 to steps (excluded). The steps value can be
-        found in the configuration field of a Shutter.
-        Not all gateways or shutters support this feature.
-
-        Args:
-            shutter_id: int
-            position: int (in body)
-
-        Returns:
-            Returns a shutter with id
-        """
-        return None
-
-    async def move_to_preset(
-        self,
-        shutter_id: int,
-    ) -> Any:
-        """Move the specified Shutter to its preset position (defined in POST .../preset).
-
-        Not all gateways or shutters support this feature.
-
-        Args:
-            shutter_id: int
-
-        Returns:
-            Returns a shutter with id
-        """
-        return None

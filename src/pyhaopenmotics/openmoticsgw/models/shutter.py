@@ -46,7 +46,6 @@ class Attributes:
     compass_point: str
     surface_area: str
 
-
     @staticmethod
     def from_dict(data: dict[str, Any]) -> Attributes:
         """Return Attributes object from OpenMotics API response.
@@ -62,6 +61,7 @@ class Attributes:
             compass_point=data.get("compass_point", "None"),
             surface_area=data.get("surface_area", "None"),
         )
+
 
 @dataclass
 class Shutter:

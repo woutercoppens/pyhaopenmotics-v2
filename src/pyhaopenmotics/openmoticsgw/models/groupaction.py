@@ -6,6 +6,7 @@ from typing import Any
 
 from .location import Location
 
+
 @dataclass
 class GroupAction:
     """Class holding an OpenMotics GroupAction.
