@@ -1,6 +1,7 @@
 """Module HTTP communication with the OpenMotics API."""
 
-from .cloud.models import Installation
+from pyhaopenmotics.cloud.models import Installation
+
 from .errors import (
     OpenMoticsConnectionError,
     OpenMoticsConnectionTimeoutError,
