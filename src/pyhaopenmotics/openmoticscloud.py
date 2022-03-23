@@ -165,6 +165,7 @@ class OpenMoticsCloud:
 
         if "application/json" in resp.headers.get("Content-Type", ""):
             response_data = await resp.json()
+            print(response_data)
             return response_data
 
         return await resp.text()

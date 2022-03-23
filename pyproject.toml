@@ -26,9 +26,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-aiohttp = ">=3.8.1"
-yarl = ">=1.6.0"
-backoff = ">=1.9.0"
+aiohttp = "^3.8.1"
+yarl = "^1.6.0"
+backoff = "^1.9.0"
 pydantic = "^1.9"
 
 [tool.poetry.dev-dependencies]
@@ -41,16 +41,16 @@ coverage = {version = "^6.3", extras = ["toml"]}
 darglint = "^1.8.1"
 flake8 = "^4.0.1"
 flake8-bandit = "^3.0.0"
-flake8-bugbear = "^22.1.11"
+flake8-bugbear = "^22.3.20"
 flake8-builtins = "^1.5.3"
 flake8-comprehensions = "^3.8.0"
-flake8-docstrings = "^1.5.0"
+flake8-docstrings = "^1.6.0"
 flake8-eradicate = "^1.2.0"
 flake8-markdown = "^0.3.0"
 flake8-simplify = "^0.18.1"
 isort = "^5.10.1"
 mypy = "^0.941"
-pre-commit = "^2.16.0"
+pre-commit = "^2.17.0"
 pre-commit-hooks = "^4.1.0"
 pylint = "^2.12.2"
 pytest = "^7.1.1"
