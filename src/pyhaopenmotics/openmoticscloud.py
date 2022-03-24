@@ -165,7 +165,6 @@ class OpenMoticsCloud:
 
         if "application/json" in resp.headers.get("Content-Type", ""):
             response_data = await resp.json()
-            print(response_data)
             return response_data
 
         return await resp.text()
@@ -204,11 +203,8 @@ class OpenMoticsCloud:
         )
         return response
 
-    async def subscribe_webhook(self, installation_id: int) -> None:
+    async def subscribe_webhook(self) -> None:
         """Register a webhook with OpenMotics for live updates.
-
-        Args:
-            installation_id: int
 
         """
         # Register webhook
@@ -216,14 +212,19 @@ class OpenMoticsCloud:
             "/ws/events",
             method=aiohttp.hdrs.METH_POST,
             data={
-                "action": "set_subscription",
-                "types": [
-                    "OUTPUT_CHANGE",
-                    "SHUTTER_CHANGE",
-                    "THERMOSTAT_CHANGE",
-                    "THERMOSTAT_GROUP_CHANGE",
-                ],
-                "installation_ids": [installation_id],
+                "type": "ACTION",
+                "data": {
+                    "action": "set_subscription",
+                    "types": [
+                        "OUTPUT_CHANGE",
+                        "SENSOR_CHANGE",
+                        "SHUTTER_CHANGE",
+                        "THERMOSTAT_CHANGE",
+                        "THERMOSTAT_GROUP_CHANGE",
+                        "VENTILATION_CHANGE",
+                    ],
+                    "installation_ids": [self.installation_id],
+                },
             },
         )
 

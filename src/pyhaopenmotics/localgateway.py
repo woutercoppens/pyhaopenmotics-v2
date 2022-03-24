@@ -222,7 +222,6 @@ class LocalGateway:
         )
 
         self.token = resp["token"]
-        print(self.token)
 
     async def subscribe_webhook(self, installation_id: str) -> None:
         """Register a webhook with OpenMotics for live updates.
