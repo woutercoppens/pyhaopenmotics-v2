@@ -6,7 +6,7 @@ import asyncio
 
 import aiohttp
 import pytest
-from aresponses import Response, ResponsesMockServer
+from aresponses import ResponsesMockServer
 
 from pyhaopenmotics import OpenMoticsCloud
 from pyhaopenmotics.const import CLOUD_API_VERSION, CLOUD_BASE_URL
