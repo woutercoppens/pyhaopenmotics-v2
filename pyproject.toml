@@ -181,7 +181,8 @@ include = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--cov"
+# addopts = "--cov"
+addopts = "--cov --cov-report term-missing --cov-report xml --cov=pyhaopenmotics tests"
 
 [tool.vulture]
 min_confidence = 80

@@ -204,9 +204,7 @@ class OpenMoticsCloud:
         return response
 
     async def subscribe_webhook(self) -> None:
-        """Register a webhook with OpenMotics for live updates.
-
-        """
+        """Register a webhook with OpenMotics for live updates."""
         # Register webhook
         await self._request(
             "/ws/events",
