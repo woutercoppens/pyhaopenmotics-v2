@@ -23,13 +23,8 @@ get_installations_data_request = {
 }
 
 
-@pytest.fixture
-def event_loop():
-    loop = asyncio.get_event_loop()
-    yield loop
-
 @pytest.mark.asyncio
-async def test_timeout(aresponses: ResponsesMockServer) -> None:  # type: ignore
+async def test_timeout(aresponses: ResponsesMockServer) -> None:
     """Test request timeout."""
     # Faking a timeout by sleeping
     async def response_handler(_):  # type: ignore
@@ -50,7 +45,7 @@ async def test_timeout(aresponses: ResponsesMockServer) -> None:  # type: ignore
 
 
 @pytest.mark.asyncio
-async def test_http_error400(aresponses: ResponsesMockServer) -> None:  # type: ignore
+async def test_http_error400(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 404 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,
@@ -66,7 +61,7 @@ async def test_http_error400(aresponses: ResponsesMockServer) -> None:  # type: 
 
 
 @pytest.mark.asyncio
-async def test_http_error500(aresponses: ResponsesMockServer) -> None:  # type: ignore
+async def test_http_error500(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 500 response handling."""
     aresponses.add(
         CLOUD_BASE_URL,
