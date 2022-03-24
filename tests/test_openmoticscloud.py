@@ -33,6 +33,7 @@ async def test_timeout(aresponses: ResponsesMockServer) -> None:  # type: ignore
     """Test request timeout."""
     # Faking a timeout by sleeping
     async def response_handler(_):  # type: ignore
+        """Test request timeout."""
         await asyncio.sleep(2)
         return aresponses.Response(body="Goodmorning!")
 
