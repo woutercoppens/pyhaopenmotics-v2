@@ -10,7 +10,6 @@ from typing import Any, Optional
 import aiohttp
 import async_timeout
 import backoff
-from aiohttp.client import ClientError
 from yarl import URL
 
 from .__version__ import __version__
@@ -61,14 +60,6 @@ class OpenMoticsCloud:
         self.token_refresh_method = token_refresh_method
         self.user_agent = f"PyHAOpenMotics/{__version__}"
 
-        self.installations = OpenMoticsInstallations(self)
-        self.outputs = OpenMoticsOutputs(self)
-        self.groupactions = OpenMoticsGroupActions(self)
-        self.lights = OpenMoticsLights(self)
-        self.sensors = OpenMoticsSensors(self)
-        self.shutters = OpenMoticsShutters(self)
-        self.thermostats = OpenMoticsThermostats(self)
-
     @property
     def installation_id(self) -> int | None:
         """Get installation id.
@@ -99,7 +90,7 @@ class OpenMoticsCloud:
         params: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> Any:
-        """Make post request using the underlying httpx AsyncClient.
+        """Make post request using the underlying aiohttp clientsession.
 
         with the default timeout of 15s. in case of retryable exceptions,
         requests are retryed for up to 10 times or 5 minutes.
@@ -156,7 +147,7 @@ class OpenMoticsCloud:
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
         except (
-            ClientError,
+            aiohttp.ClientError,
             socket.gaierror,
         ) as exception:
             raise OpenMoticsConnectionError(
@@ -232,6 +223,69 @@ class OpenMoticsCloud:
             "/ws/events",
             method=aiohttp.hdrs.METH_DELETE,
         )
+
+    @property
+    def installations(self) -> OpenMoticsInstallations:
+        """Get installations.
+
+        Returns:
+            OpenMoticsInstallations
+        """
+        return OpenMoticsInstallations(self)
+
+    @property
+    def outputs(self) -> OpenMoticsOutputs:
+        """Get outputs.
+
+        Returns:
+            OpenMoticsOutputs
+        """
+        return OpenMoticsOutputs(self)
+
+    @property
+    def groupactions(self) -> OpenMoticsGroupActions:
+        """Get groupactions.
+
+        Returns:
+            OpenMoticsGroupActions
+        """
+        return OpenMoticsGroupActions(self)
+
+    @property
+    def lights(self) -> OpenMoticsLights:
+        """Get lights.
+
+        Returns:
+            OpenMoticsLights
+        """
+        return OpenMoticsLights(self)
+
+    @property
+    def sensors(self) -> OpenMoticsSensors:
+        """Get sensors.
+
+        Returns:
+            OpenMoticsSensors
+        """
+        return OpenMoticsSensors(self)
+
+    @property
+    def shutters(self) -> OpenMoticsShutters:
+        """Get shutters.
+
+        Returns:
+            OpenMoticsShutters
+        """
+        return OpenMoticsShutters(self)
+
+    @property
+    def thermostats(self) -> OpenMoticsThermostats:
+        """Get thermostats.
+
+        Returns:
+            OpenMoticsThermostats
+        """
+        return OpenMoticsThermostats(self)
 
     async def close(self) -> None:
         """Close open client session."""

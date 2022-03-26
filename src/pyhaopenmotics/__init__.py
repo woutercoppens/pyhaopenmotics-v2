@@ -7,6 +7,7 @@ from .errors import (
     OpenMoticsConnectionTimeoutError,
     OpenMoticsError,
 )
+from .helpers import get_ssl_context
 from .localgateway import LocalGateway
 from .openmoticscloud import OpenMoticsCloud
 
@@ -17,4 +18,5 @@ __all__ = [
     "OpenMoticsConnectionError",
     "OpenMoticsConnectionTimeoutError",
     "Installation",
+    "get_ssl_context",
 ]

@@ -10,7 +10,6 @@ from typing import Any, Optional
 import aiohttp
 import async_timeout
 import backoff
-from aiohttp.client import ClientError, ClientResponseError
 from yarl import URL
 
 from .__version__ import __version__
@@ -74,13 +73,6 @@ class LocalGateway:
             print("setting self.auth")
             self.auth = {"username": self.username, "password": self.password}
 
-        self.outputs = OpenMoticsOutputs(self)
-        self.sensors = OpenMoticsSensors(self)
-        self.groupactions = OpenMoticsGroupActions(self)
-        self.shutters = OpenMoticsShutters(self)
-        self.thermostats = OpenMoticsThermostats(self)
-        self.lights = OpenMoticsLights(self)  # implemented to be compatible with cloud
-
     @backoff.on_exception(
         backoff.expo, OpenMoticsConnectionError, max_tries=3, logger=None
     )
@@ -92,7 +84,7 @@ class LocalGateway:
         data: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> Any:
-        """Make post request using the underlying httpx AsyncClient.
+        """Make post request using the underlying aiohttp clientsession.
 
         with the default timeout of 15s. in case of retryable exceptions,
         requests are retryed for up to 10 times or 5 minutes.
@@ -145,14 +137,14 @@ class LocalGateway:
             raise OpenMoticsConnectionTimeoutError(
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
-        except ClientResponseError as exception:
+        except (aiohttp.ClientResponseError) as exception:
             if exception.status in [401, 403]:
                 raise AuthenticationException() from exception
                 # and try to fetch a new token
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
-        except (socket.gaierror, ClientError) as exception:
+        except (socket.gaierror, aiohttp.ClientError) as exception:
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
@@ -252,6 +244,61 @@ class LocalGateway:
             "/ws/events",
             method=aiohttp.hdrs.METH_DELETE,
         )
+
+    @property
+    def outputs(self) -> OpenMoticsOutputs:
+        """Get outputs.
+
+        Returns:
+            OpenMoticsOutputs
+        """
+        return OpenMoticsOutputs(self)
+
+    @property
+    def groupactions(self) -> OpenMoticsGroupActions:
+        """Get groupactions.
+
+        Returns:
+            OpenMoticsGroupActions
+        """
+        return OpenMoticsGroupActions(self)
+
+    @property
+    def lights(self) -> OpenMoticsLights:
+        """Get lights.
+
+        Returns:
+            OpenMoticsLights
+        """
+        # implemented to be compatible with cloud
+        return OpenMoticsLights(self)
+
+    @property
+    def sensors(self) -> OpenMoticsSensors:
+        """Get sensors.
+
+        Returns:
+            OpenMoticsSensors
+        """
+        return OpenMoticsSensors(self)
+
+    @property
+    def shutters(self) -> OpenMoticsShutters:
+        """Get shutters.
+
+        Returns:
+            OpenMoticsShutters
+        """
+        return OpenMoticsShutters(self)
+
+    @property
+    def thermostats(self) -> OpenMoticsThermostats:
+        """Get thermostats.
+
+        Returns:
+            OpenMoticsThermostats
+        """
+        return OpenMoticsThermostats(self)
 
     async def close(self) -> None:
         """Close open client session."""

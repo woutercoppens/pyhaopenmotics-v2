@@ -1,6 +1,7 @@
 """Asynchronous Python client for the OpenMotics API."""
 
 import logging
+import ssl
 from typing import Any
 
 
@@ -55,3 +56,22 @@ def merge_dicts(list_a: list[Any], dkey: str, list_b: list[Any]) -> list[Any]:
         return list_a
     result = [d1 | {dkey: d2} for d1, d2 in zip(list_a, list_b)]
     return result
+
+
+def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
+    """Get ssl_context for local gateway.
+
+    Args:
+        verify_ssl: bool
+
+    Returns:
+        ssl.SSLContext
+    """
+    if verify_ssl:
+        ssl_context = ssl.create_default_context()
+    else:
+        # self signed certificates
+        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+    return ssl_context

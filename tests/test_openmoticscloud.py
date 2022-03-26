@@ -3,6 +3,7 @@
 # pylint: disable=protected-access
 # # mypy: ignore-errors
 import asyncio
+import socket
 
 import aiohttp
 import pytest
@@ -23,9 +24,11 @@ get_installations_data_request = {
 }
 
 
+@pytest.mark.enable_socket
 @pytest.mark.asyncio
 async def test_timeout(aresponses: ResponsesMockServer) -> None:
     """Test request timeout."""
+    assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Faking a timeout by sleeping
     async def response_handler(_):  # type: ignore
         """Test request timeout."""
@@ -44,9 +47,11 @@ async def test_timeout(aresponses: ResponsesMockServer) -> None:
             assert await open_motics._request("/")
 
 
+@pytest.mark.enable_socket
 @pytest.mark.asyncio
 async def test_http_error400(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 404 response handling."""
+    assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
         CLOUD_BASE_URL,
         CLOUD_API_VERSION,
@@ -60,9 +65,11 @@ async def test_http_error400(aresponses: ResponsesMockServer) -> None:
             assert await open_motics._request("/")
 
 
+@pytest.mark.enable_socket
 @pytest.mark.asyncio
 async def test_http_error500(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 500 response handling."""
+    assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
         CLOUD_BASE_URL,
         CLOUD_API_VERSION,
