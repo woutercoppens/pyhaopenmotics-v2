@@ -18,14 +18,15 @@ from .errors import (
     AuthenticationException,
     OpenMoticsConnectionError,
     OpenMoticsConnectionTimeoutError,
+    OpenMoticsConnectionSslError,
 )
+from .helpers import get_ssl_context
 from .openmoticsgw.groupactions import OpenMoticsGroupActions
 from .openmoticsgw.lights import OpenMoticsLights
 from .openmoticsgw.outputs import OpenMoticsOutputs
 from .openmoticsgw.sensors import OpenMoticsSensors
 from .openmoticsgw.shutters import OpenMoticsShutters
 from .openmoticsgw.thermostats import OpenMoticsThermostats
-from .helpers import get_ssl_context
 
 
 class LocalGateway:
@@ -69,9 +70,7 @@ class LocalGateway:
         if ssl_context is not None:
             self.ssl_context = ssl_context
         else:
-            self.ssl_context = get_ssl_context(
-                verify_ssl=self.tls
-            )
+            self.ssl_context = get_ssl_context(verify_ssl=self.tls)
 
         self.user_agent = f"PyHAOpenMotics/{__version__}"
 
@@ -144,6 +143,10 @@ class LocalGateway:
             raise OpenMoticsConnectionTimeoutError(
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
+        except aiohttp.ClientConnectorSSLError as exception:
+            raise OpenMoticsConnectionSslError(
+                "Error with SSL certificate."
+            ) from exception
         except (aiohttp.ClientResponseError) as exception:
             if exception.status in [401, 403]:
                 raise AuthenticationException() from exception
@@ -151,15 +154,11 @@ class LocalGateway:
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
-        except aiohttp.client_exceptions.ClientConnectorSSLError as exception:
+        except (socket.gaierror, aiohttp.ClientError) as exception:
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
-        except (socket.gaierror, aiohttp.ClientError) as exception:
-            raise OpenMoticsConnectionError(
-                "Error with SSL certificate."
-            ) from exception
-            
+
         if "application/json" in resp.headers.get("Content-Type", ""):
             response_data = await resp.json()
             return response_data

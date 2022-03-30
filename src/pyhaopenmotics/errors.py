@@ -12,6 +12,9 @@ class OpenMoticsConnectionError(OpenMoticsError):
 class OpenMoticsConnectionTimeoutError(OpenMoticsConnectionError):
     """OpenMotics connection Timeout exception."""
 
+class OpenMoticsConnectionSslError(OpenMoticsConnectionError):
+    """OpenMotics connection SSL exception."""
+
 
 class AuthenticationException(Exception):
     """This Exception is raised when the user credentials are not valid."""
