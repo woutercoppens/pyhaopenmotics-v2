@@ -676,11 +676,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pylint"
-<<<<<<< HEAD
 version = "2.13.4"
-=======
-version = "2.13.3"
->>>>>>> cf7b85ba46fe5b121d3e6c651f2fc6a6d3e66b42
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -989,11 +985,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-<<<<<<< HEAD
-content-hash = "e5fca8d082e28d8fb8e1bffc28f4eb37343f9900e045bb1ee5445eabed18d591"
-=======
-content-hash = "de4fe2016669ae43b5a60170279c5df398f49ca4e2be95bb5ebe3199d028e9fa"
->>>>>>> cf7b85ba46fe5b121d3e6c651f2fc6a6d3e66b42
+content-hash = "743dd31cf553e3c09cd6fed3fe55896e53cd1f70d3d08138e909f9ad9038ed2f"
 
 [metadata.files]
 aiohttp = [
