@@ -1,9 +1,10 @@
 # Python: Asynchronous Python client for the Openmotics API
 
 [![GitHub Release][releases-shield]][releases]
+[![Python Versions][python-versions-shield]][pypi]
 ![Project Stage][project-stage-shield]
 ![Project Maintenance][maintenance-shield]
-[![License][license-shield]](LICENSE.md)
+[![License AGPL v3][license-shield]](LICENSE.md)
 
 [![Build Status][build-shield]][build]
 [![Code Coverage][codecov-shield]][codecov]
@@ -98,6 +99,7 @@ check [the contributor's page][contributors].
 
 This project is licensed under the AGPLv3 License - see the LICENSE.md file for details
 
+[license-shield]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
 [build-shield]: https://github.com/woutercoppens/pyhaopenmotics-v2/workflows/Continuous%20Integration/badge.svg
 [build]: https://github.com/woutercoppens/pyhaopenmotics-v2/actions
 [contributors]: https://github.com/woutercoppens/pyhaopenmotics-v2/graphs/contributors
@@ -108,5 +110,6 @@ This project is licensed under the AGPLv3 License - see the LICENSE.md file for 
 [poetry]: https://python-poetry.org
 [pre-commit]: https://pre-commit.com/
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
+[pypi]: https://pypi.org/project/pyhaopenmotics/
 [releases]: https://github.com/woutercoppens/pyhaopenmotics-v2/releases
 [semver]: http://semver.org/spec/v2.0.0.html
