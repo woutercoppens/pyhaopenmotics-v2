@@ -13,7 +13,8 @@ Asynchronous Python client for the OpenMotics API.
 
 ## About
 
-An asynchronous python client for the OpenMotics API to control the outputs.
+An asynchronous python client for the OpenMotics API to control the outputs
+and other modules.
 
 This library is created to support the integration in
 [Home Assistant](https://www.home-assistant.io).
@@ -27,36 +28,7 @@ pip install .
 
 ## Usage
 
-```python
-from pyhaopenmotics import CloudClient
-
-
-async def main():
-    async with CloudClient(
-        client_id,
-        client_secret,
-    ) as bc:
-        await bc.get_token()
-
-    installations = await bc.installations.get_all()
-    print(installations)
-
-    i_id = installations[0].idx
-
-    installation = await bc.installations.get_by_id(i_id)
-    print(installation)
-    print(installation.idx)
-    print(installation.name)
-
-    outputs = await bc.outputs.get_all(i_id)
-    print(outputs)
-
-    print(outputs[0].state)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+See examples folder. 
 
 ## Changelog & Releases
 
@@ -90,7 +62,7 @@ development.
 
 You need at least:
 
-- Python 3.8+
+- Python 3.9+
 - [Poetry][poetry-install]
 - NodeJS 12+ (including NPM)
 
@@ -126,12 +98,15 @@ check [the contributor's page][contributors].
 
 This project is licensed under the AGPLv3 License - see the LICENSE.md file for details
 
-[build-shield]: https://github.com/woutercoppens/python-openmotics/workflows/Continuous%20Integration/badge.svg
-[build]: https://github.com/woutercoppens/python-openmotics/actions
-[contributors]: https://github.com/woutercoppens/python-openmotics/graphs/contributors
-[woutercoppens]: https://github.com/woutercoppens/python-openmotics
+[build-shield]: https://github.com/woutercoppens/pyhaopenmotics-v2/workflows/Continuous%20Integration/badge.svg
+[build]: https://github.com/woutercoppens/pyhaopenmotics-v2/actions
+[contributors]: https://github.com/woutercoppens/pyhaopenmotics-v2/graphs/contributors
+[woutercoppens]: https://github.com/woutercoppens/pyhaopenmotics-v2
 [keepchangelog]: http://keepachangelog.com/en/1.0.0/
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2021.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2022.svg
+[poetry-install]: https://python-poetry.org/docs/#installation
+[poetry]: https://python-poetry.org
+[pre-commit]: https://pre-commit.com/
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
-[releases]: https://github.com/woutercoppens/python-openmotics/releases
+[releases]: https://github.com/woutercoppens/pyhaopenmotics-v2/releases
 [semver]: http://semver.org/spec/v2.0.0.html
