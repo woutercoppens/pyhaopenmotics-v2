@@ -7,8 +7,6 @@
 [![License AGPL v3][license-shield]](LICENSE.md)
 
 [![Build Status][build-shield]][build]
-[![Code Coverage][codecov-shield]][codecov]
-[![Code Quality][code-quality-shield]][code-quality]
 
 Asynchronous Python client for the OpenMotics API.
 
@@ -100,8 +98,10 @@ check [the contributor's page][contributors].
 This project is licensed under the AGPLv3 License - see the LICENSE.md file for details
 
 [license-shield]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
-[build-shield]: https://github.com/woutercoppens/pyhaopenmotics-v2/workflows/Continuous%20Integration/badge.svg
+[build-shield]: https://github.com/woutercoppens/pyhaopenmotics-v2/workflows/tests.yaml/badge.svg
 [build]: https://github.com/woutercoppens/pyhaopenmotics-v2/actions
+[code-quality-shield]: https://img.shields.io/lgtm/grade/python/g/woutercoppens/pyhaopenmotics.svg?logo=lgtm&logoWidth=18
+[code-quality]: https://lgtm.com/projects/g/woutercoppens/pyhaopenmotics/context:python
 [contributors]: https://github.com/woutercoppens/pyhaopenmotics-v2/graphs/contributors
 [woutercoppens]: https://github.com/woutercoppens/pyhaopenmotics-v2
 [keepchangelog]: http://keepachangelog.com/en/1.0.0/
