@@ -6,6 +6,7 @@ import asyncio
 import logging
 import socket
 import ssl
+import time
 from typing import Any, Optional
 
 import aiohttp
@@ -17,8 +18,8 @@ from .__version__ import __version__
 from .errors import (
     AuthenticationException,
     OpenMoticsConnectionError,
-    OpenMoticsConnectionTimeoutError,
     OpenMoticsConnectionSslError,
+    OpenMoticsConnectionTimeoutError,
 )
 from .helpers import get_ssl_context
 from .openmoticsgw.groupactions import OpenMoticsGroupActions
@@ -27,6 +28,11 @@ from .openmoticsgw.outputs import OpenMoticsOutputs
 from .openmoticsgw.sensors import OpenMoticsSensors
 from .openmoticsgw.shutters import OpenMoticsShutters
 from .openmoticsgw.thermostats import OpenMoticsThermostats
+
+_LOGGER = logging.getLogger(__name__)
+
+LOCAL_TOKEN_EXPIRES_IN = 3600
+CLOCK_OUT_OF_SYNC_MAX_SEC = 20
 
 
 class LocalGateway:
@@ -60,6 +66,7 @@ class LocalGateway:
         """
         self.session = session
         self.token = None
+        self.token_expires_at: float = 0
 
         self.localgw = localgw
         self.password = password
@@ -76,7 +83,7 @@ class LocalGateway:
 
         self.auth = None
         if self.username and self.password:
-            logging.debug("LocalGateway setting self.auth")
+            _LOGGER.debug("LocalGateway setting self.auth")
             self.auth = {"username": self.username, "password": self.password}
 
     @backoff.on_exception(
@@ -88,6 +95,7 @@ class LocalGateway:
         *,
         method: str = aiohttp.hdrs.METH_POST,
         data: dict[str, Any] | None = None,
+        headers: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> Any:
         """Make post request using the underlying aiohttp clientsession.
@@ -99,6 +107,7 @@ class LocalGateway:
             path: path
             method: post
             data: dict
+            headers: dict
             **kwargs: extra args
 
         Returns:
@@ -107,6 +116,7 @@ class LocalGateway:
         Raises:
             OpenMoticsConnectionError: An error occurred while communitcation with
                 the OpenMotics API.
+            OpenMoticsConnectionSslError: Error with SSL certificates.
             OpenMoticsConnectionTimeoutError: A timeout occurred while communicating
                 with the OpenMotics API.
             AuthenticationException: raised when token is expired.
@@ -114,13 +124,6 @@ class LocalGateway:
         url = URL.build(
             scheme="https", host=self.localgw, port=self.port, path="/"
         ).join(URL(path))
-
-        headers = {
-            "User-Agent": self.user_agent,
-            "Accept": "application/json, text/plain, */*",
-        }
-
-        data = self.get_post_data(data)
 
         if self.session is None:
             self.session = aiohttp.ClientSession()
@@ -137,20 +140,29 @@ class LocalGateway:
                     **kwargs,
                 )
 
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                body = await resp.text()
+                _LOGGER.debug(
+                    "Request with status=%s, body=%s",
+                    resp.status,
+                    body,
+                )
+
             resp.raise_for_status()
 
         except asyncio.TimeoutError as exception:
             raise OpenMoticsConnectionTimeoutError(
                 "Timeout occurred while connecting to OpenMotics API"
             ) from exception
-        except aiohttp.ClientConnectorSSLError as exception:
+        except (aiohttp.ClientConnectorSSLError) as exception:
+            # Expired certificate / Date ISSUE
+            # pylint: disable=bad-exception-context
             raise OpenMoticsConnectionSslError(
                 "Error with SSL certificate."
             ) from exception
         except (aiohttp.ClientResponseError) as exception:
             if exception.status in [401, 403]:
                 raise AuthenticationException() from exception
-                # and try to fetch a new token
             raise OpenMoticsConnectionError(
                 "Error occurred while communicating with OpenMotics API."
             ) from exception
@@ -166,64 +178,41 @@ class LocalGateway:
         return await resp.text()
 
     async def exec_action(
-        self, path: str, data: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        path: str,
+        data: dict[str, Any] | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> Any:
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
             path: path
             data: dict
-            **kwargs: extra args
+            headers: dict
 
         Returns:
             response json or text
         """
-        if self.token is None:
-            await self.login()
+        # Try to execute the action.
+        return await self._request(
+            path,
+            method=aiohttp.hdrs.METH_POST,
+            data=data,
+            headers=await self._get_auth_headers(headers),
+        )
 
-        try:
-            # Try to execute the action.
-            return await self._request(
-                path,
-                method=aiohttp.hdrs.METH_POST,
-                data=data,
-                **kwargs,
-            )
-        except AuthenticationException:
-            # Get a new token and retry the action.
-            await self.login()
-            return await self._request(
-                path,
-                method=aiohttp.hdrs.METH_POST,
-                data=data,
-                **kwargs,
-            )
-
-    def get_post_data(self, data: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Get the full post data dict, this method adds the token to the dict.
-
-        Args:
-            data: dict
-
-        Returns:
-            data with token added
-        """
-        if data is not None:
-            dcopy = data.copy()
-        else:
-            dcopy = {}
-        if self.token is not None:
-            dcopy["token"] = self.token
-        return dcopy
-
-    async def login(self) -> None:
+    async def get_token(self) -> None:
         """Login to the gateway: sets the token in the connector."""
         resp = await self._request(
             path="login",
             data=self.auth,
         )
-
-        self.token = resp["token"]
+        if resp["success"] is True:
+            self.token = resp["token"]
+            self.token_expires_at = time.time() + LOCAL_TOKEN_EXPIRES_IN
+        else:
+            self.token = None
+            self.token_expires_at = 0
 
     async def subscribe_webhook(self, installation_id: str) -> None:
         """Register a webhook with OpenMotics for live updates.
@@ -246,6 +235,7 @@ class LocalGateway:
                 ],
                 "installation_ids": [installation_id],
             },
+            headers=await self._get_auth_headers(),
         )
 
     async def unsubscribe_webhook(self) -> None:
@@ -253,7 +243,38 @@ class LocalGateway:
         await self._request(
             "/ws/events",
             method=aiohttp.hdrs.METH_DELETE,
+            headers=await self._get_auth_headers(),
         )
+
+    async def _get_auth_headers(
+        self,
+        headers: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Update the auth headers to include a working token.
+
+        Args:
+            headers: dict
+
+        Returns:
+            headers
+        """
+        if (
+            self.token is None
+            or self.token_expires_at < time.time() + CLOCK_OUT_OF_SYNC_MAX_SEC
+        ):
+            await self.get_token()
+
+        if headers is None:
+            headers = {}
+
+        headers.update(
+            {
+                "User-Agent": self.user_agent,
+                "Accept": "application/json, text/plain, */*",
+                "Authorization": f"Bearer {self.token}",
+            }
+        )
+        return headers
 
     @property
     def outputs(self) -> OpenMoticsOutputs:

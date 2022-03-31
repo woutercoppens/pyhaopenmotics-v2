@@ -58,7 +58,7 @@ async def main() -> None:
         tls=tls,
         ssl_context=ssl_context,
     ) as omclient:
-        await omclient.login()
+        # await omclient.login()
 
         version = await omclient.exec_action("get_version")
         print(version)

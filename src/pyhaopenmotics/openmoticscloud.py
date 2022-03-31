@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import socket
 from collections.abc import Awaitable, Callable
 from typing import Any, Optional
@@ -23,6 +24,8 @@ from .cloud.shutters import OpenMoticsShutters
 from .cloud.thermostats import OpenMoticsThermostats
 from .const import CLOUD_API_URL
 from .errors import OpenMoticsConnectionError, OpenMoticsConnectionTimeoutError
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class OpenMoticsCloud:
@@ -138,6 +141,14 @@ class OpenMoticsCloud:
                     headers=headers,
                     params=params,
                     **kwargs,
+                )
+
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                body = await resp.text()
+                _LOGGER.debug(
+                    "Request with status=%s, body=%s",
+                    resp.status,
+                    body,
                 )
 
             resp.raise_for_status()

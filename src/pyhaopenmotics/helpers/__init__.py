@@ -75,7 +75,9 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        # ssl_context.options &= ~ssl.OP_NO_SSLv3 # noqa: E800
-        # ssl_context.minimum_version = ssl.TLSVersion.TLSv1 # noqa: E800
-        # ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols # noqa: E800
+        ssl_context.options &= ~ssl.OP_NO_SSLv3  # noqa: E800
+        ssl_context.minimum_version = ssl.TLSVersion.TLSv1  # noqa: E800
+        ssl_context.set_ciphers(
+            "AES256-SHA"
+        )  # enables weaker ciphers and protocols # noqa: E800
     return ssl_context

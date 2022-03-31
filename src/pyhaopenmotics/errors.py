@@ -5,15 +5,16 @@ class OpenMoticsError(Exception):
     """Generic OpenMotics exception."""
 
 
+class OpenMoticsConnectionSslError(OpenMoticsError):
+    """OpenMotics connection SSL exception."""
+
+
 class OpenMoticsConnectionError(OpenMoticsError):
     """OpenMotics connection exception."""
 
 
 class OpenMoticsConnectionTimeoutError(OpenMoticsConnectionError):
     """OpenMotics connection Timeout exception."""
-
-class OpenMoticsConnectionSslError(OpenMoticsConnectionError):
-    """OpenMotics connection SSL exception."""
 
 
 class AuthenticationException(Exception):
