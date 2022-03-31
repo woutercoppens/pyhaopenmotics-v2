@@ -27,7 +27,7 @@ pip install .
 
 ## Usage
 
-See examples folder. 
+See examples folder.
 
 ## Changelog & Releases
 
