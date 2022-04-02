@@ -63,7 +63,7 @@ class OpenMoticsShutters:  # noqa: SIM119
             if goc["success"] is True:
                 self.shutter_configs = goc["config"]
 
-        shutters_status = await self._omcloud.exec_action("get_shutter_status")
+        shutters_status = await self._omcloud.exec_action("get_shutters_status")
         status = shutters_status["status"]
 
         data = merge_dicts(self.shutter_configs, "status", status)
