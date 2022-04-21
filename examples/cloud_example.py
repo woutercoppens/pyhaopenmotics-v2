@@ -101,6 +101,9 @@ async def main() -> None:
         tuga = await omclient.thermostats.units.get_all()
         print(tuga)
 
+        shutters = await omclient.shutters.get_all()
+        print(shutters)
+
         await omclient.close()
 
 
