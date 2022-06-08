@@ -94,7 +94,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "backoff"
-version = "2.0.1"
+version = "2.1.2"
 description = "Function decoration for backoff and retry"
 category = "main"
 optional = false
@@ -995,7 +995,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d504b4e22d6e591ab9df53c8c8af6f636ace5285bf96692a176d4a38fcaa7e5f"
+content-hash = "fa91acf86c1be8bac7e23dc03b52e998e0377540342fc51d4335b4eef3cadaae"
 
 [metadata.files]
 aiohttp = [
@@ -1101,8 +1101,8 @@ attrs = [
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 backoff = [
-    {file = "backoff-2.0.1-py3-none-any.whl", hash = "sha256:8700797e5f45e41ee3bf357137f074a174797016dc9ad3c2b974a955bab92b50"},
-    {file = "backoff-2.0.1.tar.gz", hash = "sha256:bd6f32d4aff2607a578e847bf5bdb978a0eb1911fe5c0b0a73325328881bb31c"},
+    {file = "backoff-2.1.2-py3-none-any.whl", hash = "sha256:b135e6d7c7513ba2bfd6895bc32bc8c66c6f3b0279b4c6cd866053cfd7d3126b"},
+    {file = "backoff-2.1.2.tar.gz", hash = "sha256:407f1bc0f22723648a8880821b935ce5df8475cf04f7b6b5017ae264d30f6069"},
 ]
 bandit = [
     {file = "bandit-1.7.4-py3-none-any.whl", hash = "sha256:412d3f259dab4077d0e7f0c11f50f650cc7d10db905d98f6520a95a18049658a"},
