@@ -771,7 +771,7 @@ pytest = ">=3.6.3"
 
 [[package]]
 name = "pyupgrade"
-version = "2.34.0"
+version = "2.37.1"
 description = "A tool to automatically upgrade syntax for newer versions."
 category = "dev"
 optional = false
@@ -995,7 +995,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "bc76b6159f13a341320870281f084245e0a6771f3418090faac69f43f56bcab1"
+content-hash = "ce5473fbc53f2535f7f17733a7f92ecfa010d4742d429f53fdc3ea898ec7b2f9"
 
 [metadata.files]
 aiohttp = []
