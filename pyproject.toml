@@ -65,7 +65,7 @@ pytest-socket = "^0.5.1"
 pyupgrade = "^2.37.3"
 safety = "^1.10.3"
 vulture = "^2.5"
-yamllint = "^1.27.1"
+yamllint = "^1.28.0"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/woutercoppens/pyhaopenmotics/issues"
