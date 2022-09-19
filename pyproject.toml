@@ -64,7 +64,7 @@ pytest-cov = "^3.0.0"
 pytest-socket = "^0.5.1"
 pyupgrade = "^2.38.0"
 safety = "^1.10.3"
-vulture = "^2.5"
+vulture = "^2.6"
 yamllint = "^1.28.0"
 
 [tool.poetry.urls]
