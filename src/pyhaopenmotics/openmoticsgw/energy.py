@@ -1,19 +1,18 @@
-"""Module containing the base of an sensor."""
+"""Module containing the base of an energy sensor."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pyhaopenmotics.helpers import merge_dicts
-from pyhaopenmotics.openmoticsgw.models.sensor import Sensor
+from pyhaopenmotics.openmoticsgw.models.energy import EnergySensor
 
 if TYPE_CHECKING:
     from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
 
 
-class OpenMoticsSensors:  # noqa: SIM119
+class OpenMoticsEnergySensors:  # noqa: SIM119
 
-    """Object holding information of the OpenMotics sensors.
+    """Object holding information of the OpenMotics energy sensors.
 
     All actions related to Sensors or a specific Sensor.
     """
@@ -51,27 +50,41 @@ class OpenMoticsSensors:  # noqa: SIM119
     async def get_all(  # noqa: A003
         self,
         sensor_filter: str | None = None,
-    ) -> list[Sensor]:
-        """Get a list of all sensor objects.
+    ) -> list[EnergySensor]:
+        """Get a list of all energy sensor objects.
 
         Args:
             sensor_filter: str
 
         Returns
         -------
-            Dict with all sensors
+            List with all energy sensors
         """
         if len(self.sensor_configs) == 0:
-            goc = await self._omcloud.exec_action("get_sensor_configurations")
+            goc = await self._omcloud.exec_action("get_power_modules")
             if goc["success"] is True:
-                self.sensor_configs = goc["config"]
+                self.sensor_configs = goc["modules"]
 
-        sensors_status = await self._omcloud.exec_action("get_sensor_status")
-        status = sensors_status["status"]
+        sensors_status = await self._omcloud.exec_action("get_realtime_power")
 
-        data = merge_dicts(self.sensor_configs, "status", status)
+        data = []
+        total_idx = 0
+        for module in self.sensor_configs:
+            module_id = str(module.get("id"))
+            if module_id is None:  # pylint: disable=consider-using-assignment-expr
+                continue
+            for idx, status in enumerate(sensors_status[module_id]):
+                data.append(
+                    {
+                        "id": total_idx,
+                        "name": module[f"input{idx}"],
+                        "inverted": module[f"inverted{idx}"],
+                        "status": status,
+                    }
+                )
+                total_idx += 1
 
-        sensors = [Sensor.from_dict(device) for device in data]
+        sensors = [EnergySensor.from_dict(device) for device in data]
 
         if sensor_filter is not None:
             # implemented later
@@ -82,15 +95,15 @@ class OpenMoticsSensors:  # noqa: SIM119
     async def get_by_id(
         self,
         sensor_id: int,
-    ) -> Sensor | None:
-        """Get sensor by id.
+    ) -> EnergySensor | None:
+        """Get energy sensor by id.
 
         Args:
             sensor_id: int
 
         Returns
         -------
-            Returns a sensor with id
+            Returns an energy sensor with id
         """
         for sensor in await self.get_all():
             if sensor.idx == sensor_id:

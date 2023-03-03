@@ -10,8 +10,8 @@ import pytest
 from aresponses import ResponsesMockServer
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.const import CLOUD_API_VERSION, CLOUD_BASE_URL
-from pyhaopenmotics.errors import OpenMoticsConnectionError, OpenMoticsError
+from pyhaopenmotics.client.const import CLOUD_API_URL
+from pyhaopenmotics.client.errors import OpenMoticsConnectionError, OpenMoticsError
 
 get_token_data_request = {
     "grant_type": "client_credentials",
@@ -29,13 +29,14 @@ get_installations_data_request = {
 async def test_timeout(aresponses: ResponsesMockServer) -> None:
     """Test request timeout."""
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     # Faking a timeout by sleeping
     async def response_handler(_):  # type: ignore
         """Test request timeout."""
         await asyncio.sleep(2)
         return aresponses.Response(body="Goodmorning!")
 
-    aresponses.add(CLOUD_BASE_URL, CLOUD_API_VERSION, "POST", response_handler)
+    aresponses.add(CLOUD_API_URL, "/", "POST", response_handler)
 
     async with aiohttp.ClientSession() as session:
         open_motics = OpenMoticsCloud(
@@ -53,8 +54,8 @@ async def test_http_error400(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 404 response handling."""
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
-        CLOUD_BASE_URL,
-        CLOUD_API_VERSION,
+        CLOUD_API_URL,
+        "/",
         "GET",
         aresponses.Response(text="OMG PUPPIES!", status=404),
     )
@@ -71,8 +72,8 @@ async def test_http_error500(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 500 response handling."""
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
-        CLOUD_BASE_URL,
-        CLOUD_API_VERSION,
+        CLOUD_API_URL,
+        "/",
         "GET",
         aresponses.Response(
             body=b'{"status":"nok"}',

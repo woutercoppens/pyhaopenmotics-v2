@@ -2,18 +2,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Optional
-
-from pyhaopenmotics.helpers import merge_dicts
+from typing import TYPE_CHECKING, Any
 
 from .models.shutter import Shutter
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
+    from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
 
 
 @dataclass
 class OpenMoticsShutters:  # noqa: SIM119
+
     """Object holding information of the OpenMotics shutters.
 
     All actions related to Shutters or a specific Shutter.
@@ -23,6 +22,7 @@ class OpenMoticsShutters:  # noqa: SIM119
         """Init the installations object.
 
         Args:
+        ----
             omcloud: LocalGateway
         """
         self._omcloud = omcloud
@@ -32,7 +32,8 @@ class OpenMoticsShutters:  # noqa: SIM119
     def shutter_configs(self) -> list[Any]:
         """Get a list of all shutter confs.
 
-        Returns:
+        Returns
+        -------
             list of all shutter confs
         """
         return self._shutter_configs
@@ -42,6 +43,7 @@ class OpenMoticsShutters:  # noqa: SIM119
         """Set a list of all shutter confs.
 
         Args:
+        ----
             shutter_configs: list
         """
         self._shutter_configs = shutter_configs
@@ -55,7 +57,8 @@ class OpenMoticsShutters:  # noqa: SIM119
         Args:
             shutter_filter: str
 
-        Returns:
+        Returns
+        -------
             list with all shutters
         """
         if len(self.shutter_configs) == 0:
@@ -63,10 +66,16 @@ class OpenMoticsShutters:  # noqa: SIM119
             if goc["success"] is True:
                 self.shutter_configs = goc["config"]
 
-        shutters_status = await self._omcloud.exec_action("get_shutters_status")
-        status = shutters_status["status"]
+        shutters_status = await self._omcloud.exec_action("get_shutter_status")
+        status = shutters_status["detail"]
 
-        data = merge_dicts(self.shutter_configs, "status", status)
+        data = []
+        for shutter in self.shutter_configs:
+            shutter_id = str(shutter.get("id"))
+            if shutter_id is not None and shutter_id in status:
+                data.append(shutter | {"status": status[shutter_id]})
+            else:
+                data.append(shutter)
 
         shutters = [Shutter.from_dict(device) for device in data]
 
@@ -79,13 +88,14 @@ class OpenMoticsShutters:  # noqa: SIM119
     async def get_by_id(
         self,
         shutter_id: int,
-    ) -> Optional[Shutter]:
+    ) -> Shutter | None:
         """Get shutter by id.
 
         Args:
             shutter_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a shutter with id
         """
         for shutter in await self.get_all():
@@ -102,7 +112,8 @@ class OpenMoticsShutters:  # noqa: SIM119
         Args:
             shutter_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a shutter with id
         """
         data = {"id": shutter_id}
@@ -117,7 +128,8 @@ class OpenMoticsShutters:  # noqa: SIM119
         Args:
             shutter_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a shutter with id
         """
         data = {"id": shutter_id}
@@ -132,7 +144,8 @@ class OpenMoticsShutters:  # noqa: SIM119
         Args:
             shutter_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a shutter with id
         """
         data = {"id": shutter_id}
@@ -153,7 +166,8 @@ class OpenMoticsShutters:  # noqa: SIM119
             shutter_id: int
             position: int  (in body)
 
-        Returns:
+        Returns
+        -------
             Returns a shutter with id
         """
         data = {"id": shutter_id, "position": position}

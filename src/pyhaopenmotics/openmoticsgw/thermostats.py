@@ -2,20 +2,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pyhaopenmotics.helpers import merge_dicts
-from pyhaopenmotics.openmoticsgw.models.thermostat import (
-    ThermostatGroup,
-    ThermostatUnit,
-)
+from pyhaopenmotics.openmoticsgw.models.thermostat import ThermostatGroup, ThermostatUnit
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
+    from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
 
 
 @dataclass
 class OpenMoticsThermostats:  # noqa: SIM119
+
     """Object holding information of the OpenMotics thermostats.
 
     All actions related to thermostats or a specific thermostat.
@@ -25,6 +23,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         """Init the installations object.
 
         Args:
+        ----
             omcloud: LocalGateway
         """
         self._omcloud = omcloud
@@ -33,7 +32,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         self.groups = OpenMoticsThermostatGroups(self._omcloud)
         self.units = OpenMoticsThermostatUnits(self._omcloud)
 
-    async def set_mode(  # pylint:disable=W9008,R0201
+    async def set_mode(  # pylint:disable=W9008
         self,
         mode: str,
     ) -> Any:
@@ -42,14 +41,15 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Args:
             mode: "HEATING|COOLING"
 
-        Returns:
+        Returns
+        -------
             Returns None
         """
         if mode:
             pass
         return None
 
-    async def set_state(  # pylint:disable=W9008,R0201
+    async def set_state(  # pylint:disable=W9008
         self,
         state: str,
     ) -> Any:
@@ -58,7 +58,8 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Args:
             state: "ON|OFF"
 
-        Returns:
+        Returns
+        -------
             Returns None
         """
         if state:
@@ -67,6 +68,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
 
 
 class OpenMoticsThermostatGroups:  # noqa: SIM119
+
     """Object holding information of the OpenMotics thermostats.
 
     All actions related to thermostats or a specific thermostat.
@@ -76,6 +78,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         """Init the installations object.
 
         Args:
+        ----
             omcloud: LocalGateway
         """
         self._omcloud = omcloud
@@ -85,7 +88,8 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
     def thermostatgroup_configs(self) -> list[Any]:
         """Get a list of all thermostat confs.
 
-        Returns:
+        Returns
+        -------
             list of all thermostatgroup_configs
         """
         return self._thermostatgroup_configs
@@ -95,6 +99,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         """Set a list of all thermostat confs.
 
         Args:
+        ----
             thermostatgroup_configs: list
         """
         self._thermostatgroup_configs = thermostatgroup_configs
@@ -108,7 +113,8 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Args:
             thermostatgroup_filter: str
 
-        Returns:
+        Returns
+        -------
             Dict with all ThermostatGroup
         """
         if len(self.thermostatgroup_configs) == 0:
@@ -116,9 +122,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
             if goc["success"] is True:
                 self.thermostatgroup_configs = goc["config"]
 
-        thermostatgroup_status = await self._omcloud.exec_action(
-            "get_thermostat_group_status"
-        )
+        thermostatgroup_status = await self._omcloud.exec_action("get_thermostat_group_status")
         status = thermostatgroup_status["status"]
 
         data = merge_dicts(self.thermostatgroup_configs, "status", status)
@@ -134,13 +138,14 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
     async def get_by_id(
         self,
         thermostatgroup_id: int,
-    ) -> Optional[ThermostatGroup]:
+    ) -> ThermostatGroup | None:
         """Get thermostat by id.
 
         Args:
             thermostatgroup_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatgroup with id
         """
         for thermostatgroup in await self.get_all():
@@ -148,7 +153,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
                 return thermostatgroup
         return None
 
-    async def set_mode(  # pylint:disable=W9008,R0201
+    async def set_mode(  # pylint:disable=W9008
         self,
         thermostatgroup_id: int,
         mode: str,
@@ -159,7 +164,8 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
             thermostatgroup_id: int
             mode: "HEATING|COOLING"
 
-        Returns:
+        Returns
+        -------
             Returns a output with id
         """
         if thermostatgroup_id or mode:
@@ -168,6 +174,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
 
 
 class OpenMoticsThermostatUnits:  # noqa: SIM119
+
     """Object holding information of the OpenMotics thermostats.
 
     All actions related to thermostats or a specific thermostat.
@@ -177,6 +184,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         """Init the installations object.
 
         Args:
+        ----
             _omcloud: LocalGateway
         """
         self._omcloud = _omcloud
@@ -186,7 +194,8 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
     def thermostatunit_configs(self) -> list[Any]:
         """Get a list of all thermostatunit confs.
 
-        Returns:
+        Returns
+        -------
             list of all thermostatunit_configs
         """
         return self._thermostatunit_configs
@@ -196,6 +205,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         """Set a list of all thermostatunit confs.
 
         Args:
+        ----
             thermostatunit_configs: list
         """
         self._thermostatunit_configs = thermostatunit_configs
@@ -209,7 +219,8 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Args:
             thermostatunit_filter: str
 
-        Returns:
+        Returns
+        -------
             Dict with all ThermostatUnit
         """
         if len(self.thermostatunit_configs) == 0:
@@ -233,13 +244,14 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
     async def get_by_id(
         self,
         thermostatunit_id: int,
-    ) -> Optional[ThermostatUnit]:
+    ) -> ThermostatUnit | None:
         """Get thermostatunit by id.
 
         Args:
             thermostatunit_id: int
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatunit with id
         """
         for thermostatunit in await self.get_all():
@@ -247,7 +259,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
                 return thermostatunit
         return None
 
-    async def set_state(  # pylint:disable=W9008,R0201
+    async def set_state(  # pylint:disable=W9008
         self,
         thermostatunit_id: int,
         state: str,
@@ -258,14 +270,15 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             thermostatunit_id: int
             state: "ON|OFF"
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatunit with id
         """
         if thermostatunit_id or state:
             pass
         return None
 
-    async def set_temperature(  # pylint:disable=W9008,R0201
+    async def set_temperature(  # pylint:disable=W9008
         self,
         thermostatunit_id: int,
         temperature: float,
@@ -276,14 +289,15 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             thermostatunit_id: int
             temperature: float
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatunit with id
         """
         if thermostatunit_id or temperature:
             pass
         return None
 
-    async def set_preset(  # pylint:disable=W9008,R0201
+    async def set_preset(  # pylint:disable=W9008
         self,
         thermostatunit_id: int,
         preset: str,
@@ -294,14 +308,15 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             thermostatunit_id: int
             preset: "AUTO|AWAY|PARTY|VACATION"
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatunit with id
         """
         if thermostatunit_id or preset:
             pass
         return None
 
-    async def set_preset_config(  # pylint: disable=too-many-arguments,W9008,R0201
+    async def set_preset_config(  # pylint: disable=too-many-arguments,W9008
         self,
         thermostatunit_id: int,
         heating_away_temp: float,
@@ -322,10 +337,10 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
             cooling_vacation_temp: float,
             cooling_party_temp: float,
 
-        Returns:
+        Returns
+        -------
             Returns a thermostatunit with id
         """
-
         payload = {
             "heating": {
                 "AWAY": heating_away_temp,

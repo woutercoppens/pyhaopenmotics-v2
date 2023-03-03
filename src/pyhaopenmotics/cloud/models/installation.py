@@ -1,32 +1,36 @@
 """Installation Model for the OpenMotics API."""
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 class Allowed(BaseModel):
+
     """Object holding an OpenMotics Installation."""
 
-    allowed: Optional[bool]
+    allowed: bool | None
 
 
 class Acl(BaseModel):
+
     """Object holding an OpenMotics Installation."""
 
-    configure: Optional[Allowed]
-    view: Optional[Allowed]
-    control: Optional[Allowed]
+    configure: Allowed | None
+    view: Allowed | None
+    control: Allowed | None
 
 
 class Network(BaseModel):
+
     """Object holding an OpenMotics Installation."""
 
-    local_ip_address: Optional[str]
+    local_ip_address: str | None
 
 
 class Installation(BaseModel):
+
     """Object holding an OpenMotics Installation.
 
     # noqa: E800
@@ -64,24 +68,24 @@ class Installation(BaseModel):
     # pylint: disable=too-many-instance-attributes
     idx: int = Field(..., alias="id")
     name: str
-    description: str
-    gateway_model: Optional[str]
+    description: str | None
+    gateway_model: str | None
     acl: Acl = Field(..., alias="_acl")
     version: str = Field(..., alias="_version")
-    user_role: Optional[dict[str, Any]]
-    registration_key: Optional[str]
-    platform: Optional[str]
-    building_roles: Optional[dict[str, Any]]
-    network: Optional[Network]
-    flags: Optional[dict[str, Any]]
-    features: Optional[dict[str, Any]]
+    user_role: dict[str, Any] | None
+    registration_key: str | None
+    platform: str | None
+    building_roles: dict[str, Any] | None
+    network: Network | None
+    flags: dict[str, Any] | None
+    features: dict[str, Any] | None
 
     def __str__(self) -> str:
         """Represent the class objects as a string.
 
-        Returns:
+        Returns
+        -------
             string
 
         """
-
         return f"{self.idx}_{self.name}"

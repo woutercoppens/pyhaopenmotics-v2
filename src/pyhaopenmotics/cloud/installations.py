@@ -9,10 +9,11 @@ from pydantic import parse_obj_as
 from pyhaopenmotics.cloud.models.installation import Installation
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
+    from pyhaopenmotics.client.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
 
 
 class OpenMoticsInstallations:  # noqa: SIM119
+
     """Object holding information of the OpenMotics installation.
 
     All actions related to Installations or a specific Installation.
@@ -22,6 +23,7 @@ class OpenMoticsInstallations:  # noqa: SIM119
         """Init the installations object.
 
         Args:
+        ----
             omcloud: OpenMoticsCloud
         """
         self._omcloud = omcloud
@@ -35,7 +37,8 @@ class OpenMoticsInstallations:  # noqa: SIM119
         Args:
             installation_filter: str
 
-        Returns:
+        Returns
+        -------
             all installations objects
 
         Optional filter (URL encoded JSON).
@@ -69,7 +72,8 @@ class OpenMoticsInstallations:  # noqa: SIM119
         Args:
             installation_id: int
 
-        Returns:
+        Returns
+        -------
             a single Installation object
 
         """

@@ -98,12 +98,12 @@ check [the contributor's page][contributors].
 This project is licensed under the AGPLv3 License - see the LICENSE.md file for details
 
 [license-shield]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
-[build-shield]: https://github.com/woutercoppens/pyhaopenmotics-v2/workflows/tests.yaml/badge.svg
-[build]: https://github.com/woutercoppens/pyhaopenmotics-v2/actions
-[code-quality-shield]: https://img.shields.io/lgtm/grade/python/g/woutercoppens/pyhaopenmotics.svg?logo=lgtm&logoWidth=18
-[code-quality]: https://lgtm.com/projects/g/woutercoppens/pyhaopenmotics/context:python
-[contributors]: https://github.com/woutercoppens/pyhaopenmotics-v2/graphs/contributors
-[woutercoppens]: https://github.com/woutercoppens/pyhaopenmotics-v2
+[build-shield]: https://github.com/openmotics/pyhaopenmotics/actions/workflows/tests.yaml/badge.svg
+[build]: https://github.com/openmotics/pyhaopenmotics/actions/workflows/tests.yaml
+[code-quality-shield]: https://img.shields.io/lgtm/grade/python/g/openmotics/pyhaopenmotics.svg?logo=lgtm&logoWidth=18
+[code-quality]: https://lgtm.com/projects/g/openmotics/pyhaopenmotics/context:python
+[contributors]: https://github.com/openmotics/pyhaopenmotics/graphs/contributors
+[woutercoppens]: https://github.com/woutercoppens
 [keepchangelog]: http://keepachangelog.com/en/1.0.0/
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2022.svg
 [poetry-install]: https://python-poetry.org/docs/#installation
@@ -111,5 +111,5 @@ This project is licensed under the AGPLv3 License - see the LICENSE.md file for 
 [pre-commit]: https://pre-commit.com/
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
 [pypi]: https://pypi.org/project/pyhaopenmotics/
-[releases]: https://github.com/woutercoppens/pyhaopenmotics-v2/releases
+[releases]: https://github.com/openmotics/pyhaopenmotics/releases
 [semver]: http://semver.org/spec/v2.0.0.html
