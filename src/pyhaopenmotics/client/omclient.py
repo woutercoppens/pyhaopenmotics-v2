@@ -110,6 +110,7 @@ class OMClient(ABC):
         headers = await self._get_auth_headers(headers)
 
         if self.session is None:
+            # self.session = aiohttp.ClientSession(trust_env=True)
             self.session = aiohttp.ClientSession()
             self._close_session = True
 
@@ -126,6 +127,7 @@ class OMClient(ABC):
                     headers=headers,
                     params=params,
                     data=data,
+                    proxy="http://192.168.0.126:9090",
                     **kwargs,
                 )
 
@@ -304,12 +306,15 @@ class OMClient(ABC):
             scheme="wss",
         )
         headers = await self._get_ws_headers()
+        protocols = await self._get_ws_protocols()
 
         try:
             self._wsclient = await self.session.ws_connect(
-                url="wss://api.openmotics.com/ws/events",
+                url="wss://api.openmotics.com/api/v1.1/ws/events",
+                #protocols=protocols,
                 headers=headers,
                 heartbeat=30,
+                proxy="http://192.168.0.126:9090",
             )
         except (
             aiohttp.WSServerHandshakeError,
@@ -337,20 +342,26 @@ class OMClient(ABC):
         # await self.update()
 
         if not self.session:
-            raise OpenMoticsError("The WLED device at {self.host} does not support WebSockets")
+            raise OpenMoticsError("This installation at {self.host} does not support WebSockets")
 
         await self._get_url(
             # path="/ws/events",
-            path="/ws/events",
+            path="/ws",
             scheme="wss",
         )
         headers = await self._get_ws_headers()
 
         try:
-            async with websockets.connect(
-                "wss://api.openmotics.com/ws/events",
+            ssl_context = get_ssl_context(
+                "wss://api.openmotics.com/api/v1.1/ws/events",
+                verify,
+            )
+            async with websockets.client.connect(
+                "wss://api.openmotics.com/api/v1.1/ws/events",
                 # compression=None,
                 extra_headers=headers,
+                #subprotocols=[self._get_ws_protocols()],
+                close_timeout=0,
             ) as websocket:
                 _LOGGER.info("WebSocket Opened.")
 

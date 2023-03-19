@@ -71,7 +71,7 @@ async def main() -> None:
 
         # await omclient.get(path="/ws/events", scheme="wss")
 
-        await omclient.connect2()
+        await omclient.connect()
 
         # await omclient.unsubscribe_webhook()
 

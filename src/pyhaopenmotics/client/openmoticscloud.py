@@ -8,7 +8,9 @@ from typing import Any
 
 import aiohttp
 from yarl import URL
+import base64
 
+from pyhaopenmotics.helpers import base64_encode
 from pyhaopenmotics.cloud.groupactions import OpenMoticsGroupActions
 from pyhaopenmotics.cloud.installations import OpenMoticsInstallations
 from pyhaopenmotics.cloud.lights import OpenMoticsLights
@@ -158,13 +160,44 @@ class OpenMoticsCloud(OMClient):
         if headers is None:
             headers = {}
 
+        base64_message = base64_encode(self.token)
+
+        # base64_message = 'ejVvaGE1dzdkbDZxdHNhbG1rZWZoczhoMGhlaTh6OGo'
+        print(base64_message)
+        
         headers.update(
             {
                 # "User-Agent": self.user_agent,
-                "Authorization": f"Bearer {self.token}",
-            }
+                # "Authorization": f"Bearer {self.token}",
+                "Sec-WebSocket-Protocol": f"authorization.bearer.{base64_message}",
+                #"Sec-WebSocket-Extensions": "permessage-deflate",
+                "Origin": "https://api.openmotics.com",
+                "Connection": "Upgrade",
+                "Upgrade": "websocket",
+                "Sec-Fetch-Dest": "websocket",
+                "Sec-Fetch-Mode": "websocket",
+                "Sec-Fetch-site": "same-site",            }
         )
         return headers
+
+    async def _get_ws_protocols(
+        self,
+    ) -> str:
+        """Update the auth headers to include a working token.
+
+        Args:
+            headers: dict
+
+        Returns
+        -------
+            headers
+        """
+        if self.token_refresh_method is not None:
+            self.token = await self.token_refresh_method()
+        base64_message = base64_encode(self.token)
+        protocols = f"authorization.bearer.{base64_message}"
+        
+        return protocols
 
     @property
     def installations(self) -> OpenMoticsInstallations:

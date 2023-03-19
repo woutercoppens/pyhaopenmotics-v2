@@ -1,5 +1,6 @@
 """Asynchronous Python client for the OpenMotics API."""
 
+import base64
 import logging
 import ssl
 from typing import Any
@@ -82,3 +83,15 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
         ssl_context.minimum_version = ssl.TLSVersion.TLSv1  # noqa: E800
         ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols # noqa: E800
     return ssl_context
+
+def base64_encode(value: str) -> str:
+    encoded = base64.urlsafe_b64encode(str.encode(value))
+    result = encoded.rstrip(b"=")
+    return result.decode()
+
+
+def base64_decode(value: str) -> str:
+    padding = 4 - (len(value) % 4)
+    value = value + ("=" * padding)
+    result = base64.urlsafe_b64decode(value)
+    return result.decode()
