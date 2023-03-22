@@ -88,6 +88,7 @@ class OMClient(ABC):
         requests are retryed for up to 10 times or 5 minutes.
 
         Args:
+        ----
             path: path
             method: get of post
             params: dict
@@ -95,11 +96,11 @@ class OMClient(ABC):
             headers: dict
             **kwargs: extra args
 
-        Returns
+        Returns:
         -------
             response json or text
 
-        Raises
+        Raises:
         ------
             OpenMoticsConnectionError: An error occurred while communication with
                 the OpenMotics API.
@@ -171,10 +172,11 @@ class OMClient(ABC):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             path: str
             scheme: str
 
-        Returns
+        Returns:
         -------
             url: str
         Subclass must override.
@@ -189,9 +191,10 @@ class OMClient(ABC):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
 
@@ -207,9 +210,10 @@ class OMClient(ABC):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
 
@@ -221,10 +225,11 @@ class OMClient(ABC):
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
+        ----
             path: string
             **kwargs: any
 
-        Returns
+        Returns:
         -------
             response json or text
         """
@@ -239,10 +244,11 @@ class OMClient(ABC):
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
+        ----
             path: path
             **kwargs: extra args
 
-        Returns
+        Returns:
         -------
             response json or text
         """
@@ -306,12 +312,12 @@ class OMClient(ABC):
             scheme="wss",
         )
         headers = await self._get_ws_headers()
-        protocols = await self._get_ws_protocols()
+        await self._get_ws_protocols()
 
         try:
             self._wsclient = await self.session.ws_connect(
                 url="wss://api.openmotics.com/api/v1.1/ws/events",
-                #protocols=protocols,
+                # protocols=protocols,
                 headers=headers,
                 heartbeat=30,
                 proxy="http://192.168.0.126:9090",
@@ -352,7 +358,7 @@ class OMClient(ABC):
         headers = await self._get_ws_headers()
 
         try:
-            ssl_context = get_ssl_context(
+            get_ssl_context(
                 "wss://api.openmotics.com/api/v1.1/ws/events",
                 verify,
             )
@@ -360,7 +366,7 @@ class OMClient(ABC):
                 "wss://api.openmotics.com/api/v1.1/ws/events",
                 # compression=None,
                 extra_headers=headers,
-                #subprotocols=[self._get_ws_protocols()],
+                # subprotocols=[self._get_ws_protocols()],
                 close_timeout=0,
             ) as websocket:
                 _LOGGER.info("WebSocket Opened.")
@@ -389,9 +395,10 @@ class OMClient(ABC):
         """Listen for events on the OpenMotics WebSocket.
 
         Args:
+        ----
             callback: Method to call when a state update is received.
 
-        Raises
+        Raises:
         ------
             OpenMoticsError: Not connected to a WebSocket.
             OpenMoticsConnectionError: An connection error occurred while connected

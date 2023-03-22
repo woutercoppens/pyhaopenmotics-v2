@@ -97,11 +97,12 @@ class LocalGateway(OMClient):
         """Make get request using the underlying aiohttp.ClientSession.
 
         Args:
+        ----
             path: path
             data: dict
             headers: dict
 
-        Returns
+        Returns:
         -------
             response json or text
         """
@@ -130,10 +131,11 @@ class LocalGateway(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             path: str
             scheme: str
 
-        Returns
+        Returns:
         -------
             url: str
         """
@@ -149,9 +151,10 @@ class LocalGateway(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
         """

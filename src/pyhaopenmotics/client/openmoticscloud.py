@@ -8,9 +8,7 @@ from typing import Any
 
 import aiohttp
 from yarl import URL
-import base64
 
-from pyhaopenmotics.helpers import base64_encode
 from pyhaopenmotics.cloud.groupactions import OpenMoticsGroupActions
 from pyhaopenmotics.cloud.installations import OpenMoticsInstallations
 from pyhaopenmotics.cloud.lights import OpenMoticsLights
@@ -19,6 +17,7 @@ from pyhaopenmotics.cloud.outputs import OpenMoticsOutputs
 from pyhaopenmotics.cloud.sensors import OpenMoticsSensors
 from pyhaopenmotics.cloud.shutters import OpenMoticsShutters
 from pyhaopenmotics.cloud.thermostats import OpenMoticsThermostats
+from pyhaopenmotics.helpers import base64_encode
 
 from .const import CLOUD_API_URL
 from .omclient import OMClient
@@ -101,10 +100,11 @@ class OpenMoticsCloud(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             path: str
             scheme: str
 
-        Returns
+        Returns:
         -------
             url: str
         """
@@ -120,9 +120,10 @@ class OpenMoticsCloud(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
         """
@@ -148,9 +149,10 @@ class OpenMoticsCloud(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
         """
@@ -164,19 +166,20 @@ class OpenMoticsCloud(OMClient):
 
         # base64_message = 'ejVvaGE1dzdkbDZxdHNhbG1rZWZoczhoMGhlaTh6OGo'
         print(base64_message)
-        
+
         headers.update(
             {
                 # "User-Agent": self.user_agent,
                 # "Authorization": f"Bearer {self.token}",
                 "Sec-WebSocket-Protocol": f"authorization.bearer.{base64_message}",
-                #"Sec-WebSocket-Extensions": "permessage-deflate",
+                # "Sec-WebSocket-Extensions": "permessage-deflate",
                 "Origin": "https://api.openmotics.com",
                 "Connection": "Upgrade",
                 "Upgrade": "websocket",
                 "Sec-Fetch-Dest": "websocket",
                 "Sec-Fetch-Mode": "websocket",
-                "Sec-Fetch-site": "same-site",            }
+                "Sec-Fetch-site": "same-site",
+            }
         )
         return headers
 
@@ -186,9 +189,10 @@ class OpenMoticsCloud(OMClient):
         """Update the auth headers to include a working token.
 
         Args:
+        ----
             headers: dict
 
-        Returns
+        Returns:
         -------
             headers
         """
@@ -196,7 +200,7 @@ class OpenMoticsCloud(OMClient):
             self.token = await self.token_refresh_method()
         base64_message = base64_encode(self.token)
         protocols = f"authorization.bearer.{base64_message}"
-        
+
         return protocols
 
     @property
