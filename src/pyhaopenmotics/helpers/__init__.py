@@ -10,10 +10,11 @@ def get_key_for_word(dictionary: dict[str, Any], word: str) -> Any:
     """Return the key with value.
 
     Args:
+    ----
         dictionary: dict
         word: str
 
-    Returns
+    Returns:
     -------
         Any
     """
@@ -32,11 +33,12 @@ def merge_dicts(list_a: list[Any], dkey: str, list_b: list[Any]) -> list[Any]:
     """Merge list_b into the key 'dkey' of list_a.
 
     Args:
+    ----
         dkey: str
         list_a: list
         list_b: list
 
-    Returns
+    Returns:
     -------
         result: list
 
@@ -65,9 +67,10 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
     """Get ssl_context for local gateway.
 
     Args:
+    ----
         verify_ssl: bool
 
-    Returns
+    Returns:
     -------
         ssl.SSLContext
     """
@@ -83,6 +86,7 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
         ssl_context.minimum_version = ssl.TLSVersion.TLSv1  # noqa: E800
         ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols # noqa: E800
     return ssl_context
+
 
 def base64_encode(value: str) -> str:
     encoded = base64.urlsafe_b64encode(str.encode(value))
