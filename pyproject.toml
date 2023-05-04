@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pyhaopenmotics"
-version = "0.0.3"
+version = "0.0.2"
 description = "Asynchronous Python client for the OpenMotics API."
 authors = ["Wouter Coppens <wouter.coppens@gmail.com>"]
 maintainers = ["Wouter Coppens <wouter.coppens@gmail.com>"]
@@ -35,12 +35,12 @@ backoff = ">=1.9.0"
 pydantic = "^1.10.7"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.3.1"
+pre-commit = "3.2.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.3.1"
+pytest = "^7.2.2"
 pytest-mock = "^3.7.0"
-pytest-socket = "^0.6.0"
+pytest-socket = "^0.5.1"
 pytest-asyncio = "^0.21.0"
 pytest-cov = "^4.0.0"
 coverage = {version = "^7.2", extras = ["toml"]}
@@ -48,7 +48,7 @@ aresponses = "^2.1.6"
 
 [tool.poetry.group.examples.dependencies]
 authlib = "^1.2.0"
-httpx = "^0.24.0"
+httpx = "^0.23.3"
 python-dotenv = "^1.0.0"
 
 [tool.poetry.urls]
@@ -58,33 +58,9 @@ Changelog = "https://github.com/openmotics/pyhaopenmotics/releases"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-select = [
-  "E", # pycodestyle
-  "F", # pyflakes
-  "W", # pycodestyle
-  "S", # bandit
-  "I", # isort  # "RUF", # ruff specific exceptions
-  "ANN", # flake8-annotations
-  "B", # flake8-bugbear
-  "C", # flake8-comprehensions
-  "D", # flake-docstrings
-  "Q", # flake8-quotes
-  "T201",
-  "T203", # flake8-
-  "UP", # pyupgrade
-]
+select = [ "ALL" ]
+src = ['src']
 
-exclude = [
-  '__pycache__',
-  '.cache',
-  '.git',
-  '.md',
-  '.svg',
-  '.png',
-  'venv',
-  '.venv',
-  '.json',
-]
 ignore = [
   "ANN101", # Missing type annotation for `self` in method
   "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in
@@ -92,16 +68,23 @@ ignore = [
   "D417", # Missing argument description in the
   "D211", # no-blank-line-before-class
   "D213", # multi-line-summary-second-line
+  "PLR2004", # Magic value used in comparison, consider replacing 2 with a constant variable
+  "PLR0913", # Too many arguments to function call
+  "PGH003", # Use specific rule codes when ignoring type issues
+  "RET504", # Unnecessary variable assignment before `return` statement
+  "TRY003", # Avoid specifying long messages outside the exception class
+  "TRY300", # Consider moving this statement to an `else` block
+  # FBT001 Boolean positional arg in function definition
+  "FBT001", "FBT002", "FBT003",
 ]
-src = ['src']
 
 [tool.ruff.per-file-ignores]
-"src/**.py" = ['D106']
+"src/pyhaopenmotics/cloud/models/**.py" = ['TCH001']
+# "src/**.py" = ['D106']
 "tests/**.py" = ["S101"]
 
 [tool.ruff.isort]
-known-first-party = ["sage"]
-
+known-first-party = ["pyhaopenmotics"]
 
 [tool.black]
 include = '\.pyi?$'

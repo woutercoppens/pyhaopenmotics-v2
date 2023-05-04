@@ -9,10 +9,10 @@ from pydantic import parse_obj_as
 from pyhaopenmotics.cloud.models.installation import Installation
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.client.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
+    from pyhaopenmotics.openmoticscloud import OpenMoticsCloud  # pylint: disable=R0401
 
 
-class OpenMoticsInstallations:  # noqa: SIM119
+class OpenMoticsInstallations:
 
     """Object holding information of the OpenMotics installation.
 
@@ -28,7 +28,7 @@ class OpenMoticsInstallations:  # noqa: SIM119
         """
         self._omcloud = omcloud
 
-    async def get_all(  # noqa: A003
+    async def get_all(
         self,
         installation_filter: str | None = None,
     ) -> list[Installation]:

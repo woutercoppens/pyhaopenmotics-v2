@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING, Any
 from .models.groupaction import GroupAction
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
+    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
 
 
 @dataclass
-class OpenMoticsGroupActions:  # noqa: SIM119
+class OpenMoticsGroupActions:
 
     """Object holding information of the OpenMotics groupactions.
 
@@ -48,11 +48,11 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         """
         data = await self._omcloud.exec_action("get_group_action_configurations")
 
-        groupactions = [GroupAction.from_dict(device) for device in data["config"]]
-
         if groupaction_filter is not None:
             # implemented later
             pass
+
+        groupactions = [GroupAction.from_dict(device) for device in data["config"]]
 
         return groupactions  # type: ignore
 

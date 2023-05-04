@@ -1,6 +1,5 @@
 """Asynchronous Python client for the OpenMotics API."""
 
-import base64
 import logging
 import ssl
 from typing import Any
@@ -25,7 +24,8 @@ def get_key_for_word(dictionary: dict[str, Any], word: str) -> Any:
         return None
 
     except KeyError as err:
-        logging.error(err)
+        msg = f"Key Error: {err}"
+        logging.exception(msg)
         return None
 
 
@@ -82,20 +82,7 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        ssl_context.options &= ~ssl.OP_NO_SSLv3  # noqa: E800
-        ssl_context.minimum_version = ssl.TLSVersion.TLSv1  # noqa: E800
-        ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols # noqa: E800
+        ssl_context.options &= ~ssl.OP_NO_SSLv3
+        ssl_context.minimum_version = ssl.TLSVersion.TLSv1
+        ssl_context.set_ciphers("AES256-SHA")  # enables weaker ciphers and protocols
     return ssl_context
-
-
-def base64_encode(value: str) -> str:
-    encoded = base64.urlsafe_b64encode(str.encode(value))
-    result = encoded.rstrip(b"=")
-    return result.decode()
-
-
-def base64_decode(value: str) -> str:
-    padding = 4 - (len(value) % 4)
-    value = value + ("=" * padding)
-    result = base64.urlsafe_b64decode(value)
-    return result.decode()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# noqa: E800
 """Cloud example.
 
 How to use this script:
@@ -16,16 +15,18 @@ import os
 try:
     from dotenv import load_dotenv
 except ModuleNotFoundError as exc:
-    raise ImportError("You have to run 'pip install python-dotenv' first") from exc
+    msg = "You have to run 'pip install python-dotenv' first"
+    raise ImportError(msg) from exc
 
 try:
     from authlib.integrations.httpx_client import AsyncOAuth2Client
 except ModuleNotFoundError as exc:
-    raise ImportError("You have to run 'pip install httpx authlib' first") from exc
+    msg = "You have to run 'pip install httpx authlib' first"
+    raise ImportError(msg) from exc
 
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.client.const import CLOUD_SCOPE, OAUTH2_TOKEN
+from pyhaopenmotics.const import CLOUD_SCOPE, OAUTH2_TOKEN
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
 log = logging.getLogger()
@@ -69,11 +70,9 @@ async def main() -> None:
         await omclient.installations.get_by_id(i_id)
         omclient.installation_id = i_id
 
-        # await omclient.get(path="/ws/events", scheme="wss")
+        await omclient.subscribe_webhook()
 
-        await omclient.connect()
-
-        # await omclient.unsubscribe_webhook()
+        await omclient.unsubscribe_webhook()
 
         await omclient.close()
 

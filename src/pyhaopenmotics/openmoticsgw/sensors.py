@@ -8,10 +8,10 @@ from pyhaopenmotics.helpers import merge_dicts
 from pyhaopenmotics.openmoticsgw.models.sensor import Sensor
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
+    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
 
 
-class OpenMoticsSensors:  # noqa: SIM119
+class OpenMoticsSensors:
 
     """Object holding information of the OpenMotics sensors.
 
@@ -48,7 +48,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         """
         self._sensor_configs = sensor_configs
 
-    async def get_all(  # noqa: A003
+    async def get_all(
         self,
         sensor_filter: str | None = None,
     ) -> list[Sensor]:

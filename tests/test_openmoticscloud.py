@@ -10,8 +10,8 @@ import pytest
 from aresponses import ResponsesMockServer
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.client.const import CLOUD_API_URL
-from pyhaopenmotics.client.errors import OpenMoticsConnectionError, OpenMoticsError
+from pyhaopenmotics.const import CLOUD_API_VERSION, CLOUD_BASE_URL
+from pyhaopenmotics.errors import OpenMoticsConnectionError, OpenMoticsError
 
 get_token_data_request = {
     "grant_type": "client_credentials",
@@ -36,12 +36,12 @@ async def test_timeout(aresponses: ResponsesMockServer) -> None:
         await asyncio.sleep(2)
         return aresponses.Response(body="Goodmorning!")
 
-    aresponses.add(CLOUD_API_URL, "/", "POST", response_handler)
+    aresponses.add(CLOUD_BASE_URL, CLOUD_API_VERSION, "POST", response_handler)
 
     async with aiohttp.ClientSession() as session:
         open_motics = OpenMoticsCloud(
             session=session,
-            token="12345",  # noqa: S106
+            token="12345",
             request_timeout=1,
         )
         with pytest.raises(OpenMoticsConnectionError):
@@ -54,14 +54,14 @@ async def test_http_error400(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 404 response handling."""
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
-        CLOUD_API_URL,
-        "/",
+        CLOUD_BASE_URL,
+        CLOUD_API_VERSION,
         "GET",
         aresponses.Response(text="OMG PUPPIES!", status=404),
     )
 
     async with aiohttp.ClientSession() as session:
-        open_motics = OpenMoticsCloud(session=session, token="12345")  # noqa: S106
+        open_motics = OpenMoticsCloud(session=session, token="12345")
         with pytest.raises(OpenMoticsError):
             assert await open_motics._request("/")
 
@@ -72,8 +72,8 @@ async def test_http_error500(aresponses: ResponsesMockServer) -> None:
     """Test HTTP 500 response handling."""
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     aresponses.add(
-        CLOUD_API_URL,
-        "/",
+        CLOUD_BASE_URL,
+        CLOUD_API_VERSION,
         "GET",
         aresponses.Response(
             body=b'{"status":"nok"}',
@@ -83,6 +83,6 @@ async def test_http_error500(aresponses: ResponsesMockServer) -> None:
     )
 
     async with aiohttp.ClientSession() as session:
-        open_motics = OpenMoticsCloud(session=session, token="12345")  # noqa: S106
+        open_motics = OpenMoticsCloud(session=session, token="12345")
         with pytest.raises(OpenMoticsError):
             assert await open_motics._request("/")

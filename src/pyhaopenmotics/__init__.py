@@ -1,16 +1,17 @@
 """Module HTTP communication with the OpenMotics API."""
 
-from pyhaopenmotics.client.errors import (
-    AuthenticationException,
+from pyhaopenmotics.cloud.models import Installation
+
+from .errors import (
+    AuthenticationError,
     OpenMoticsConnectionError,
     OpenMoticsConnectionSslError,
     OpenMoticsConnectionTimeoutError,
     OpenMoticsError,
 )
-from pyhaopenmotics.client.localgateway import LocalGateway
-from pyhaopenmotics.client.openmoticscloud import OpenMoticsCloud
-from pyhaopenmotics.cloud.models import Installation
-from pyhaopenmotics.helpers import get_ssl_context
+from .helpers import get_ssl_context
+from .localgateway import LocalGateway
+from .openmoticscloud import OpenMoticsCloud
 
 __all__ = [
     "OpenMoticsCloud",
@@ -19,7 +20,7 @@ __all__ = [
     "OpenMoticsConnectionError",
     "OpenMoticsConnectionTimeoutError",
     "OpenMoticsConnectionSslError",
-    "AuthenticationException",
+    "AuthenticationError",
     "Installation",
     "get_ssl_context",
 ]
