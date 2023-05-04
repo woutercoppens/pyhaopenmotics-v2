@@ -9,11 +9,14 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import ssl
+import json
 import time
+import traceback
 
 import aiohttp
 import async_timeout
 import backoff
+import websockets
 from yarl import URL
 
 from .__version__ import __version__
@@ -23,7 +26,7 @@ from .errors import (
     OpenMoticsConnectionSslError,
     OpenMoticsConnectionTimeoutError,
 )
-from .helpers import get_ssl_context
+from .helpers import base64_encode, get_ssl_context
 from .openmoticsgw.energy import OpenMoticsEnergySensors
 from .openmoticsgw.groupactions import OpenMoticsGroupActions
 from .openmoticsgw.inputs import OpenMoticsInputs
@@ -43,6 +46,7 @@ class LocalGateway:
 
     """Docstring."""
 
+    _wsclient: aiohttp.ClientWebSocketResponse | None = None
     _close_session: bool = False
 
     def __init__(
@@ -100,6 +104,7 @@ class LocalGateway:
         method: str = aiohttp.hdrs.METH_POST,
         data: dict[str, Any] | None = None,
         headers: dict[str, Any] | None = None,
+        scheme: str = "https",
         **kwargs: Any,
     ) -> Any:
         """Make post request using the underlying aiohttp clientsession.
@@ -113,6 +118,7 @@ class LocalGateway:
             method: post
             data: dict
             headers: dict
+            scheme: str
             **kwargs: extra args
 
         Returns:
@@ -128,7 +134,10 @@ class LocalGateway:
                 with the OpenMotics API.
             AuthenticationException: raised when token is expired.
         """
-        url = URL.build(scheme="https", host=self.localgw, port=self.port, path="/").join(URL(path))
+        url = await self._get_url(
+            path=path,
+            scheme=scheme,
+        )
 
         if self.session is None:
             self.session = aiohttp.ClientSession()
@@ -217,38 +226,45 @@ class LocalGateway:
             self.token = None
             self.token_expires_at = 0
 
-    async def subscribe_webhook(self, installation_id: str) -> None:
-        """Register a webhook with OpenMotics for live updates.
+    async def _get_url(self, path: str, scheme: str = "https") -> str:
+        """Update the auth headers to include a working token.
 
         Args:
         ----
-            installation_id: int
+            path: str
+            scheme: str
 
+        Returns:
+        -------
+            url: str
         """
-        # Register webhook
-        await self._request(
-            "/ws/events",
-            method=aiohttp.hdrs.METH_POST,
-            data={
-                "action": "set_subscription",
-                "types": [
-                    "OUTPUT_CHANGE",
-                    "SHUTTER_CHANGE",
-                    "THERMOSTAT_CHANGE",
-                    "THERMOSTAT_GROUP_CHANGE",
-                ],
-                "installation_ids": [installation_id],
-            },
-            headers=await self._get_auth_headers(),
+        url = str(
+            URL.build(scheme=scheme, host=self.localgw, port=self.port, path="/").join(URL(path)),
         )
+        return url
 
-    async def unsubscribe_webhook(self) -> None:
-        """Delete all webhooks for this application ID."""
-        await self._request(
-            "/ws/events",
-            method=aiohttp.hdrs.METH_DELETE,
-            headers=await self._get_auth_headers(),
-        )
+    # async def subscribe_webhook(self, installation_id: str) -> None:
+    #     """Register a webhook with OpenMotics for live updates.
+
+    #     Args:
+    #     ----
+
+    #     """
+    #     # Register webhook
+    #     await self._request(
+    #         "/ws/events",
+    #             "types": [
+    #                 "OUTPUT_CHANGE",
+    #                 "SHUTTER_CHANGE",
+    #                 "THERMOSTAT_CHANGE",
+    #                 "THERMOSTAT_GROUP_CHANGE",
+    #             ],
+    #         },
+
+    # async def unsubscribe_webhook(self) -> None:
+    #     """Delete all webhooks for this application ID."""
+    #     await self._request(
+    #         "/ws/events",
 
     async def _get_auth_headers(
         self,
@@ -278,6 +294,149 @@ class LocalGateway:
             },
         )
         return headers
+
+    async def _get_ws_headers(
+        self,
+        headers: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Update the auth headers to include a working token.
+
+        Args:
+        ----
+            headers: dict
+
+        Returns:
+        -------
+            headers
+        """
+        if self.token is None or self.token_expires_at < time.time() + CLOCK_OUT_OF_SYNC_MAX_SEC:
+            await self.get_token()
+
+        if headers is None:
+            headers = {}
+
+        base64_message = base64_encode(self.token)
+
+        headers.update(
+            {
+                # "User-Agent": self.user_agent,
+                "Sec-WebSocket-Protocol": f"authorization.bearer.{base64_message}",
+                # "Sec-WebSocket-Extensions": "permessage-deflate",
+                "host": self.localgw,
+                "Origin": self.localgw,
+                "Connection": "Upgrade",
+                "Upgrade": "websocket",
+                "accept-encoding": "gzip, deflate, br",
+                "cache-control": "no-cache",
+                "pragma": "no-cache",
+                # "Sec-Fetch-Dest": "websocket",
+                # "Sec-Fetch-Mode": "websocket",
+                # "Sec-Fetch-site": "same-site",
+                "user-agent": "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+            },
+        )
+        return headers
+
+    @property
+    def connected(self) -> bool:
+        """Return if we are connect to the WebSocket of OpenMotics.
+
+        Returns
+        -------
+            True if we are connected to the WebSocket,
+            False otherwise.
+        """
+        return self._wsclient is not None and not self._wsclient.closed
+
+    async def connect(self) -> None:
+        """Connect to the WebSocket of OpenMotics.
+
+        Raises
+        ------
+            OpenMoticsError: The configured localgw does not support WebSocket
+                communications.
+            OpenMoticsConnectionError: Error occurred while communicating with
+                OpenMotics via the WebSocket.
+        """
+        if self.connected:
+            return
+
+        # if not self._device:
+
+        if not self.session:
+            raise OpenMoticsConnectionError(
+                "The OM device at {self.localgw} does not support WebSockets",
+            )
+
+        url = await self._get_url(
+            path="/ws/events",
+            scheme="wss",
+        )
+        headers = await self._get_ws_headers()
+
+        try:
+            self._wsclient = await self.session.ws_connect(
+                url=url,
+                headers=headers,
+                ssl=self.ssl_context,
+            )
+        except (
+            aiohttp.WSServerHandshakeError,
+            aiohttp.ClientConnectionError,
+            socket.gaierror,
+        ) as exception:
+            raise OpenMoticsConnectionError(
+                ("Error occurred while communicating with OpenMotics" f" on WebSocket at {url}",),
+            ) from exception
+
+    async def connect2(self) -> None:
+        """Connect to the WebSocket of OpenMotics.
+
+        Raises
+        ------
+            OpenMoticsError: The configured localgw does not support WebSocket
+                communications.
+            OpenMoticsConnectionError: Error occurred while communicating with
+                OpenMotics via the WebSocket.
+        """
+        if self.connected:
+            return
+
+        # if not self._device:
+
+        if not self.session:
+            raise OpenMoticsConnectionError(
+                "The OM device at {self.localgw} does not support WebSockets",
+            )
+
+        uri = await self._get_url(
+            path="/ws/events",
+            scheme="wss",
+        )
+        extra_headers = await self._get_ws_headers()
+
+        try:
+            async with websockets.connect(
+                uri=uri,
+                extra_headers=extra_headers,
+                ssl=self.ssl_context,
+            ) as websocket:
+                _LOGGER.info("WebSocket Opened.")
+                _LOGGER.info(json.loads(await websocket.recv()))
+                _LOGGER.info("websocket client connected. looping...")
+
+                while self.loop:
+                    data = json.loads(await websocket.recv())
+                    if "event" not in data:
+                        continue
+
+                    try:
+                        self.ws_handler(self, data)
+                    except:
+                        _LOGGER.error("".join(traceback.format_exc()))
+
+        except websockets.WebSocketException:
+            pass
 
     @property
     def inputs(self) -> OpenMoticsInputs:

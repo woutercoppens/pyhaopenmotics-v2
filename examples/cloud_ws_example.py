@@ -70,9 +70,10 @@ async def main() -> None:
         await omclient.installations.get_by_id(i_id)
         omclient.installation_id = i_id
 
-        await omclient.subscribe_webhook()
+        await omclient.outputs.get_all()
 
-        await omclient.unsubscribe_webhook()
+        await omclient.connect2()
+
 
         await omclient.close()
 
