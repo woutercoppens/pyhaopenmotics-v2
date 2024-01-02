@@ -26,7 +26,7 @@ except ModuleNotFoundError as exc:
 
 
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.const import CLOUD_SCOPE, OAUTH2_TOKEN
+from pyhaopenmotics.client.const import CLOUD_SCOPE, OAUTH2_TOKEN
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
 log = logging.getLogger()

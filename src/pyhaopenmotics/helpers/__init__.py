@@ -86,10 +86,49 @@ def get_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
     return ssl_context
 
 
-def base64_encode(value: str) -> str:
+# def base64_encode(value: str) -> str:
+#     """Encode token to base64.
+
+#     Required for websockets
+#     https://developer.mozilla.org/en-US/docs/Web/API/btoa
+
+#     Args:
+#     ----
+#         value: str
+
+#     Returns:
+#     -------
+#         str
+#     """
+#     encoded = base64.b64encode(str.encode(value))
+#     result = encoded.rstrip(b"=")
+#     return result.decode()
+
+
+# def base64_decode(value: str) -> str:
+#     """Decode base64 to token.
+
+#     Required for websockets
+
+#     Args:
+#     ----
+#         value: str
+
+#     Returns:
+#     -------
+#         str
+#     """
+#     padding = 4 - (len(value) % 4)
+#     value = value + ("=" * padding)
+#     result = base64.urlsafe_b64decode(value)
+#     return result.decode()
+
+
+def base64_encode(token: str) -> str:
     """Encode token to base64.
 
     Required for websockets
+    https://developer.mozilla.org/en-US/docs/Web/API/btoa
 
     Args:
     ----
@@ -99,25 +138,30 @@ def base64_encode(value: str) -> str:
     -------
         str
     """
-    encoded = base64.urlsafe_b64encode(str.encode(value))
+    btoken = bytes(token, "utf-8")
+    # encoded = base64.b64encode(str.encode(token))
+    encoded = base64.b64encode(btoken)
     result = encoded.rstrip(b"=")
     return result.decode()
 
 
-def base64_decode(value: str) -> str:
+def base64_decode(unpadded_base64_token: str) -> str:
     """Decode base64 to token.
 
     Required for websockets
 
     Args:
     ----
-        value: str
+        unpadded_base64_token : str
 
     Returns:
     -------
         str
     """
-    padding = 4 - (len(value) % 4)
-    value = value + ("=" * padding)
-    result = base64.urlsafe_b64decode(value)
-    return result.decode()
+    token = ""
+    base64_token = unpadded_base64_token + "=" * (-len(unpadded_base64_token) % 4)
+    try:
+        token = base64.b64decode(base64_token).decode("utf-8")
+    except Exception:
+        pass
+    return token

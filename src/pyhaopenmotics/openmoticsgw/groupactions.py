@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from .models.groupaction import GroupAction
 
 if TYPE_CHECKING:
-    from pyhaopenmotics.localgateway import LocalGateway  # pylint: disable=R0401
+    from pyhaopenmotics.client.localgateway import LocalGateway  # pylint: disable=R0401
 
 
 @dataclass
@@ -109,10 +109,15 @@ class OpenMoticsGroupActions:
         -------
             Returns a groupaction with id
         """
-        groupaction_list = []
-        for groupaction in await self.get_all():
-            if groupaction.name == groupaction_usage:
-                groupaction_list.append(groupaction)
+        # groupaction_list = []
+        # for groupaction in await self.get_all():
+        #     if groupaction.name == groupaction_usage:
+        #         groupaction_list.append(groupaction)
+        groupaction_list = [
+            groupaction
+            for groupaction in await self.get_all()
+            if groupaction.name == groupaction_usage
+        ]
         return groupaction_list
 
     async def scenes(self) -> Any:

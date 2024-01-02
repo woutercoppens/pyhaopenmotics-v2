@@ -21,7 +21,7 @@ except ModuleNotFoundError as exc:
     msg = "You have to run 'pip install python-dotenv' first"
     raise ImportError(msg) from exc
 
-from pyhaopenmotics import LocalGateway
+from pyhaopenmotics import LocalGateway, WebsocketClient
 
 # UNCOMMENT THIS TO SEE ALL THE HTTPX INTERNAL LOGGING
 log = logging.getLogger()
@@ -60,9 +60,11 @@ async def main() -> None:
 
         await omclient.outputs.get_by_id(0)
 
-        await omclient.connect2()
+        ws_client = WebsocketClient(baseclient=omclient, verify_ssl=False)
 
-        await omclient.close()
+        await ws_client.connect()
+
+        await ws_client.close()
 
 
 if __name__ == "__main__":

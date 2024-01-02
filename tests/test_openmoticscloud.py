@@ -8,10 +8,9 @@ import socket
 import aiohttp
 import pytest
 from aresponses import ResponsesMockServer
-
 from pyhaopenmotics import OpenMoticsCloud
-from pyhaopenmotics.const import CLOUD_API_VERSION, CLOUD_BASE_URL
-from pyhaopenmotics.errors import OpenMoticsConnectionError, OpenMoticsError
+from pyhaopenmotics.client.const import CLOUD_API_VERSION, CLOUD_BASE_URL
+from pyhaopenmotics.client.errors import OpenMoticsConnectionError, OpenMoticsError
 
 get_token_data_request = {
     "grant_type": "client_credentials",
