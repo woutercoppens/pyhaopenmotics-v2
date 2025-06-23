@@ -1,4 +1,5 @@
 """Location Model for the OpenMotics API."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel
