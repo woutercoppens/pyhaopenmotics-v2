@@ -1,4 +1,5 @@
 """Directory holding openmoticsgw."""
+
 from pyhaopenmotics.openmoticsgw.groupactions import OpenMoticsGroupActions
 from pyhaopenmotics.openmoticsgw.lights import OpenMoticsLights
 from pyhaopenmotics.openmoticsgw.outputs import OpenMoticsOutputs
