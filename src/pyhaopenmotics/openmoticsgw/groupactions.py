@@ -1,4 +1,5 @@
 """Module containing the base of an groupaction."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Args:
         ----
             omcloud: LocalGateway
+
         """
         self._omcloud = omcloud
 
@@ -45,6 +47,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
             their intended usage.
             SCENE: These GroupActions can be considered a scene,
                 e.g. watching tv or romantic dinner.
+
         """
         data = await self._omcloud.exec_action("get_group_action_configurations")
 
@@ -69,6 +72,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         for groupaction in await self.get_all():
             if groupaction.idx == groupaction_id:
@@ -88,6 +92,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         data = {"group_action_id": groupaction_id}
         return await self._omcloud.exec_action("do_group_action", data=data)
@@ -108,6 +113,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         groupaction_list = []
         for groupaction in await self.get_all():
@@ -124,6 +130,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns
         -------
             Returns all scenes
+
         """
         if (response := await self.by_usage("SCENE")) is None:
             return None
