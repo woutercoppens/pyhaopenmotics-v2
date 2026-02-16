@@ -25,6 +25,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Args:
         ----
             omcloud: OpenMoticsCloud
+
         """
         self._omcloud = omcloud
 
@@ -41,6 +42,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns:
         -------
             Dict with all sensors
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/sensors"
 
@@ -68,6 +70,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns:
         -------
             Returns a sensor with id
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/sensors/{sensor_id}"
         body = await self._omcloud.get(path)
