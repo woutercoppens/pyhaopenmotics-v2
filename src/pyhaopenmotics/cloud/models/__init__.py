@@ -1,4 +1,5 @@
 """Init file for the models."""
+
 from pyhaopenmotics.cloud.models.groupaction import GroupAction
 from pyhaopenmotics.cloud.models.installation import Installation
 from pyhaopenmotics.cloud.models.light import Light
