@@ -44,7 +44,7 @@ pytest-socket = "^0.7.0"
 pytest-asyncio = "^0.23.8"
 pytest-cov = "^4.1.0"
 coverage = {version = "^7.13", extras = ["toml"]}
-aresponses = "^2.1.6"
+aresponses = ">=2.1.6,<4.0.0"
 
 [tool.poetry.group.examples.dependencies]
 authlib = "^1.6.10"
