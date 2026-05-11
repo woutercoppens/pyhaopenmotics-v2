@@ -25,6 +25,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Args:
         ----
             omcloud: OpenMoticsCloud
+
         """
         self._omcloud = omcloud
 
@@ -41,6 +42,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
         -------
             A list of outputs
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/outputs"
 
@@ -68,6 +70,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/outputs/{output_id}"
         body = await self._omcloud.get(path)
@@ -87,6 +90,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}" f"/outputs/{output_id}/toggle"
         return await self._omcloud.post(path)
@@ -106,6 +110,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         if value is not None:
             # value: <0 - 100>
@@ -131,6 +136,7 @@ class OpenMoticsOutputs:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         if output_id is None:
             # Turn off all lights
