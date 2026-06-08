@@ -63,6 +63,7 @@ class LocalGateway(OMClient):
             tls: True, when TLS/SSL should be used.
             username: Username for HTTP auth, if enabled.
             ssl_context: ssl.SSLContext.
+
         """
         super().__init__(
             host=host,
@@ -105,6 +106,7 @@ class LocalGateway(OMClient):
         Returns:
         -------
             response json or text
+
         """
         # Try to execute the action.
         return await self._request(
@@ -138,6 +140,7 @@ class LocalGateway(OMClient):
         Returns:
         -------
             url: str
+
         """
         url = str(
             URL.build(scheme=scheme, host=self.host, port=self.port, path="/").join(URL(path))
@@ -157,6 +160,7 @@ class LocalGateway(OMClient):
         Returns:
         -------
             headers
+
         """
         if self.token is None or self.token_expires_at < time.time() + CLOCK_OUT_OF_SYNC_MAX_SEC:
             await self.get_token()
@@ -180,6 +184,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsOutputs
+
         """
         return OpenMoticsOutputs(self)
 
@@ -190,6 +195,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsGroupActions
+
         """
         return OpenMoticsGroupActions(self)
 
@@ -200,6 +206,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsLights
+
         """
         # implemented to be compatible with cloud
         return OpenMoticsLights(self)
@@ -211,6 +218,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsSensors
+
         """
         return OpenMoticsSensors(self)
 
@@ -221,6 +229,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsEnergySensors
+
         """
         return OpenMoticsEnergySensors(self)
 
@@ -231,6 +240,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsShutters
+
         """
         return OpenMoticsShutters(self)
 
@@ -241,6 +251,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             OpenMoticsThermostats
+
         """
         return OpenMoticsThermostats(self)
 
@@ -255,6 +266,7 @@ class LocalGateway(OMClient):
         Returns
         -------
             LocalGateway: The LocalGateway object.
+
         """
         return self
 
@@ -264,5 +276,6 @@ class LocalGateway(OMClient):
         Args:
         ----
             *_exc_info: Exec type.
+
         """
         await self.close()
