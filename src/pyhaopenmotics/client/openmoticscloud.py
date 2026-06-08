@@ -55,6 +55,7 @@ class OpenMoticsCloud(OMClient):
             token_refresh_method: token refresh function
             installation_id: int
             base_url: str
+
         """
         super().__init__(
             host=CLOUD_API_URL,
@@ -82,6 +83,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             The installation id that will be used for this session.
+
         """
         return self._installation_id
 
@@ -93,6 +95,7 @@ class OpenMoticsCloud(OMClient):
         ----
             installation_id: The installation id that will be used
                 for this session.
+
         """
         self._installation_id = installation_id
 
@@ -107,6 +110,7 @@ class OpenMoticsCloud(OMClient):
         Returns:
         -------
             url: str
+
         """
         url = URL(f"{self.base_url}{path}")
         if scheme is not None:
@@ -126,6 +130,7 @@ class OpenMoticsCloud(OMClient):
         Returns:
         -------
             headers
+
         """
         if self.token_refresh_method is not None:
             self.token = await self.token_refresh_method()
@@ -155,6 +160,7 @@ class OpenMoticsCloud(OMClient):
         Returns:
         -------
             headers
+
         """
         if self.token_refresh_method is not None:
             self.token = await self.token_refresh_method()
@@ -195,6 +201,7 @@ class OpenMoticsCloud(OMClient):
         Returns:
         -------
             headers
+
         """
         if self.token_refresh_method is not None:
             self.token = await self.token_refresh_method()
@@ -210,6 +217,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsInstallations
+
         """
         return OpenMoticsInstallations(self)
 
@@ -220,6 +228,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsOutputs
+
         """
         return OpenMoticsOutputs(self)
 
@@ -230,6 +239,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsGroupActions
+
         """
         return OpenMoticsGroupActions(self)
 
@@ -240,6 +250,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsLights
+
         """
         return OpenMoticsLights(self)
 
@@ -250,6 +261,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsSensors
+
         """
         return OpenMoticsSensors(self)
 
@@ -260,6 +272,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsShutters
+
         """
         return OpenMoticsShutters(self)
 
@@ -270,6 +283,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsThermostats
+
         """
         return OpenMoticsThermostats(self)
 
@@ -284,6 +298,7 @@ class OpenMoticsCloud(OMClient):
         Returns
         -------
             OpenMoticsCloud: The OpenMoticsCloud object.
+
         """
         return self
 
@@ -293,5 +308,6 @@ class OpenMoticsCloud(OMClient):
         Args:
         ----
             *_exc_info: Exec type.
+
         """
         await self.close()
