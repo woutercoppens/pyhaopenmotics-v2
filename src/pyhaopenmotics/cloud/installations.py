@@ -25,6 +25,7 @@ class OpenMoticsInstallations:  # noqa: SIM119
         Args:
         ----
             omcloud: OpenMoticsCloud
+
         """
         self._omcloud = omcloud
 
