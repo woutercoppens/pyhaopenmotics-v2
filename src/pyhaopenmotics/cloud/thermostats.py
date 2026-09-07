@@ -25,6 +25,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Args:
         ----
             omcloud: OpenMoticsCloud
+
         """
         self._omcloud = omcloud
 
@@ -44,6 +45,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Returns:
         -------
             Returns something
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/thermostats/mode"
         payload = {"mode": mode}
@@ -62,6 +64,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Returns:
         -------
             Returns something
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/thermostats/state"
         payload = {"state": state}
@@ -81,6 +84,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Args:
         ----
             _omcloud: _omcloud
+
         """
         self._omcloud = _omcloud
 
@@ -95,6 +99,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Dict with all thermostats
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/thermostats/groups"
 
@@ -115,6 +120,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatgroup_id with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -139,6 +145,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -161,6 +168,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Args:
         ----
             _omcloud: _omcloud
+
         """
         self._omcloud = _omcloud
 
@@ -175,6 +183,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Dict with all thermostatunits
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/thermostats/units"
 
@@ -195,6 +204,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -219,6 +229,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -242,6 +253,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -265,6 +277,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"
@@ -298,6 +311,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         path = (
             f"/base/installations/{self._omcloud.installation_id}"

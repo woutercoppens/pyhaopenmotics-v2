@@ -1,4 +1,5 @@
 """Module containing the base of an light."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ class OpenMoticsLights:  # noqa: SIM119
         Args:
         ----
             omcloud: LocalGateway
+
         """
         self._omcloud = omcloud
 
@@ -40,5 +42,6 @@ class OpenMoticsLights:  # noqa: SIM119
         Returns:
         -------
             list with all lights
+
         """
         return []
