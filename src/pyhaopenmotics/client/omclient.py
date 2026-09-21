@@ -60,6 +60,7 @@ class OMClient(ABC):
             tls: boolean
             ssl_context: ssl.SSLContext
             port: int
+
         """
         self.session = session
         self.request_timeout = request_timeout
@@ -106,6 +107,7 @@ class OMClient(ABC):
                 the OpenMotics API.
             OpenMoticsConnectionTimeoutError: A timeout occurred while communicating
                 with the OpenMotics API.
+
         """
         url = await self._get_url(path, scheme)
         headers = await self._get_auth_headers(headers)
@@ -180,6 +182,7 @@ class OMClient(ABC):
         -------
             url: str
         Subclass must override.
+
         """
         raise NotImplementedError("Subclass must override.")
 
@@ -199,6 +202,7 @@ class OMClient(ABC):
             headers
 
         Subclass must override.
+
         """
         raise NotImplementedError("Subclass must override.")
 
@@ -218,6 +222,7 @@ class OMClient(ABC):
             headers
 
         Subclass must override.
+
         """
         raise NotImplementedError("Subclass must override.")
 
@@ -232,6 +237,7 @@ class OMClient(ABC):
         Returns:
         -------
             response json or text
+
         """
         response = await self._request(
             path,
@@ -251,6 +257,7 @@ class OMClient(ABC):
         Returns:
         -------
             response json or text
+
         """
         response = await self._request(
             path,
@@ -285,6 +292,7 @@ class OMClient(ABC):
         -------
             True if we are connected to the WebSocket,
             False otherwise.
+
         """
         return self._wsclient is not None and not self._wsclient.closed
 
@@ -297,6 +305,7 @@ class OMClient(ABC):
                 communications.
             OpenMoticsConnectionError: Error occurred while communicating with
                 OpenMotics via the WebSocket.
+
         """
         if self.connected:
             return
@@ -340,6 +349,7 @@ class OMClient(ABC):
                 communications.
             OpenMoticsConnectionError: Error occurred while communicating with
                 OpenMotics via the WebSocket.
+
         """
         if self.connected:
             return
@@ -405,6 +415,7 @@ class OMClient(ABC):
                 to the WebSocket
             OpenMoticsConnectionClosed: The WebSocket connection to the remote
                 has been closed.
+
         """
         if not self._wsclient or not self.connected:
             raise OpenMoticsError("Not connected to the OpenMotics WebSocket")
@@ -447,6 +458,7 @@ class OMClient(ABC):
         Returns
         -------
             OMClient: The OMClient object.
+
         """
         return self
 
@@ -456,5 +468,6 @@ class OMClient(ABC):
         Args:
         ----
             *_exc_info: Exec type.
+
         """
         await self.close()
