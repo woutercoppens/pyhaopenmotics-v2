@@ -24,6 +24,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Args:
         ----
             omcloud: LocalGateway
+
         """
         self._omcloud = omcloud
         self._sensor_configs: list[Any] = []
@@ -35,6 +36,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns
         -------
             list of all sensor confs
+
         """
         return self._sensor_configs
 
@@ -45,6 +47,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Args:
         ----
             sensor_configs: list
+
         """
         self._sensor_configs = sensor_configs
 
@@ -61,6 +64,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns:
         -------
             Dict with all sensors
+
         """
         if len(self.sensor_configs) == 0:
             goc = await self._omcloud.exec_action("get_sensor_configurations")
@@ -93,6 +97,7 @@ class OpenMoticsSensors:  # noqa: SIM119
         Returns:
         -------
             Returns a sensor with id
+
         """
         for sensor in await self.get_all():
             if sensor.idx == sensor_id:

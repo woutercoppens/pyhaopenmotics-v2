@@ -1,4 +1,5 @@
 """Output Model for the OpenMotics API."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,6 +26,7 @@ class GroupLocation:
         Returns:
         -------
             A GroupLocation object.
+
         """
         return GroupLocation(
             thermostat_group_id=data.get("thermostat_group_id", 0),
@@ -53,6 +55,7 @@ class UnitLocation:
         Returns:
         -------
             A UnitLocation object.
+
         """
         return UnitLocation(
             thermostat_group_id=data.get("thermostat_group_id", 0),
@@ -80,6 +83,7 @@ class GroupStatus:
         Returns:
         -------
             A GroupStatus object.
+
         """
         return GroupStatus(
             mode=data.get("mode", "None"),
@@ -109,6 +113,7 @@ class UnitStatus:
         Returns:
         -------
             A UnitStatus object.
+
         """
         return UnitStatus(
             actual_temperature=data.get("actual_temperature", 0),
@@ -139,6 +144,7 @@ class Presets:
         Returns:
         -------
             A Presets object.
+
         """
         return Presets(
             away=data.get("away", "None"),
@@ -166,6 +172,7 @@ class Schedule:
         Returns:
         -------
             A Schedule object.
+
         """
         return Schedule(
             data=data.get("data", "None"),
@@ -195,6 +202,7 @@ class ConfigurationPreset:
         Returns:
         -------
             A ConfigurationPreset object.
+
         """
         return ConfigurationPreset(
             output_0_id=data.get("output_0_id", 0),
@@ -223,6 +231,7 @@ class Allowed:
         Returns:
         -------
             A Allowed object.
+
         """
         return Allowed(
             allowed=data.get("allowed", False),
@@ -248,6 +257,7 @@ class Acl:
         Returns:
         -------
             A Acl object.
+
         """
         return Acl(
             set_state=Allowed.from_dict(data),
@@ -274,6 +284,7 @@ class Configuration:
         Returns:
         -------
             A Configuration object.
+
         """
         return Configuration(
             heating=ConfigurationPreset.from_dict(data),
@@ -308,6 +319,7 @@ class ThermostatGroup:
         Returns:
         -------
             A ThermostatGroup object.
+
         """
         status = GroupStatus.from_dict({})
         if "status" in data:
@@ -365,6 +377,7 @@ class ThermostatUnit:
         Returns:
         -------
             A ThermostatUnit object.
+
         """
         status = UnitStatus.from_dict({})
         if "status" in data:

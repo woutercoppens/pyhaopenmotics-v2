@@ -1,4 +1,5 @@
 """Module containing the base of an thermostat."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,6 +26,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Args:
         ----
             omcloud: LocalGateway
+
         """
         self._omcloud = omcloud
         self._thermostat_configs: list[Any] = []
@@ -45,6 +47,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Returns:
         -------
             Returns None
+
         """
         if mode:
             pass
@@ -63,6 +66,7 @@ class OpenMoticsThermostats:  # noqa: SIM119
         Returns:
         -------
             Returns None
+
         """
         if state:
             pass
@@ -82,6 +86,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Args:
         ----
             omcloud: LocalGateway
+
         """
         self._omcloud = omcloud
         self._thermostatgroup_configs: list[Any] = []
@@ -93,6 +98,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns
         -------
             list of all thermostatgroup_configs
+
         """
         return self._thermostatgroup_configs
 
@@ -103,6 +109,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Args:
         ----
             thermostatgroup_configs: list
+
         """
         self._thermostatgroup_configs = thermostatgroup_configs
 
@@ -119,6 +126,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Dict with all ThermostatGroup
+
         """
         if len(self.thermostatgroup_configs) == 0:
             goc = await self._omcloud.exec_action("get_thermostat_group_configurations")
@@ -151,6 +159,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatgroup with id
+
         """
         for thermostatgroup in await self.get_all():
             if thermostatgroup.idx == thermostatgroup_id:
@@ -172,6 +181,7 @@ class OpenMoticsThermostatGroups:  # noqa: SIM119
         Returns:
         -------
             Returns a output with id
+
         """
         if thermostatgroup_id or mode:
             pass
@@ -191,6 +201,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Args:
         ----
             _omcloud: LocalGateway
+
         """
         self._omcloud = _omcloud
         self._thermostatunit_configs: list[Any] = []
@@ -202,6 +213,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns
         -------
             list of all thermostatunit_configs
+
         """
         return self._thermostatunit_configs
 
@@ -212,6 +224,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Args:
         ----
             thermostatunit_configs: list
+
         """
         self._thermostatunit_configs = thermostatunit_configs
 
@@ -228,6 +241,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Dict with all ThermostatUnit
+
         """
         if len(self.thermostatunit_configs) == 0:
             goc = await self._omcloud.exec_action("get_thermostat_configurations")
@@ -260,6 +274,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         for thermostatunit in await self.get_all():
             if thermostatunit.idx == thermostatunit_id:
@@ -281,6 +296,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         if thermostatunit_id or state:
             pass
@@ -301,6 +317,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         if thermostatunit_id or temperature:
             pass
@@ -321,6 +338,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         if thermostatunit_id or preset:
             pass
@@ -351,6 +369,7 @@ class OpenMoticsThermostatUnits:  # noqa: SIM119
         Returns:
         -------
             Returns a thermostatunit with id
+
         """
         payload = {
             "heating": {
