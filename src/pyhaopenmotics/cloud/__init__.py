@@ -1,4 +1,5 @@
 """Directory holding cloud."""
+
 from pyhaopenmotics.cloud.groupactions import OpenMoticsGroupActions
 from pyhaopenmotics.cloud.installations import OpenMoticsInstallations
 from pyhaopenmotics.cloud.lights import OpenMoticsLights
