@@ -1,4 +1,5 @@
 """Module containing the base of an output."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -24,6 +25,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Args:
         ----
             omcloud: OpenMoticsCloud
+
         """
         self._omcloud = omcloud
 
@@ -59,6 +61,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         #  },
         #  "name": "<name>"
         #  }
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/groupactions"
         if groupactions_filter:
@@ -85,6 +88,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/groupactions/{groupaction_id}"
         body = await self._omcloud.get(path)
@@ -104,6 +108,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         # E501 line too long
         path = (
@@ -128,6 +133,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns:
         -------
             Returns a groupaction with id
+
         """
         path = f"/base/installations/{self._omcloud.installation_id}/groupactions"
         query_params = {"usage": groupaction_usage.upper()}
@@ -142,6 +148,7 @@ class OpenMoticsGroupActions:  # noqa: SIM119
         Returns
         -------
             Returns all scenes
+
         """
         response = await self.by_usage("SCENE")
         return response

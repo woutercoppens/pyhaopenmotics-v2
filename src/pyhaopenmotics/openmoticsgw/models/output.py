@@ -1,4 +1,5 @@
 """Output Model for the OpenMotics API."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -29,6 +30,7 @@ class Status:
         Returns:
         -------
             A Status object.
+
         """
         return Status(
             # on = True if status = 1
@@ -88,6 +90,7 @@ class Output:
         Returns:
         -------
             A Output object.
+
         """
         output_type = OPENMOTICS_OUTPUT_TYPE_TO_NAME[data.get("type", 0)]
 
