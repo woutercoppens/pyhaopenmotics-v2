@@ -1,4 +1,5 @@
 """Location Model for the OpenMotics API."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ class FloorCoordinates:
         Returns:
         -------
             FloorCoordinates object
+
         """
         if "x" not in data or "y" not in data:
             return None
@@ -56,6 +58,7 @@ class Location:
         Returns:
         -------
             Location object
+
         """
         _floor_coordinates: FloorCoordinates | None
         _room_id: int
